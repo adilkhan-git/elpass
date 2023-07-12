@@ -11,9 +11,7 @@
           @click="toggleLeftDrawer"
         />
 
-        <q-toolbar-title> Quasar App </q-toolbar-title>
-
-        <div>Quasar v{{ $q.version }}</div>
+        <q-toolbar-title> elpass-frontend-vue-app </q-toolbar-title>
       </q-toolbar>
     </q-header>
 
@@ -61,19 +59,19 @@ const linksList = [
     title: "Посещения",
     caption: "",
     icon: "folder_open",
-    link: "#",
+    link: "http://localhost:9000/#/visits",
   },
   {
     title: "Карточки посетителей",
     caption: "",
     icon: "person_pin",
-    link: "#",
+    link: "http://localhost:9000/#/cards",
   },
   {
     title: "Настройки",
     caption: "",
     icon: "settings",
-    link: "",
+    link: "#",
   },
 ];
 
@@ -132,6 +130,4 @@ export default defineComponent({
   background-color: green;
   margin-right: 5px;
 }
-
-/* Дополнительные стили здесь */
 </style>
