@@ -3,9 +3,13 @@
     <div class="main-content">
       <h4>Карточки посетителей</h4>
       <hr class="hr" />
-      <button class="add-visit-button" @click="openModal">
-        Добавить посещение
-      </button>
+      <q-btn
+        class="add-visit-button"
+        color="primary"
+        label="Добавить посещение"
+        @click="openModal"
+      ></q-btn>
+
       <div class="search-bar">
         <input type="text" placeholder="Имя" v-model="searchName" />
         <input type="text" placeholder="Фамилия" v-model="searchLastName" />
@@ -19,7 +23,7 @@
           v-for="visitor in filteredVisitors"
           :key="visitor.id"
           :visitor="visitor"
-          @delete="deleteVisitor"
+          @delete="deleteVisitor(visitor.id)"
         />
       </div>
     </div>
@@ -82,47 +86,6 @@
 <script>
 import VisitorCard from "../components/VisitorCard.vue";
 import axios from "axios";
-import MockAdapter from "axios-mock-adapter";
-
-const mock = new MockAdapter(axios);
-
-const cards = [
-  {
-    id: 1,
-    firstName: "Иван",
-    lastName: "Петров",
-    iin: "791225758965",
-    phoneNumber: "+77478889977",
-    company: "ООО Road Construction",
-    position: "Менеджер",
-    type: "Многоразовый",
-    lastLogin: "2023-05-31",
-  },
-  {
-    id: 2,
-    firstName: "Анна",
-    lastName: "Иванова",
-    iin: "987654321098",
-    phoneNumber: "+79876543210",
-    company: "АО Kcell",
-    position: "Разработчик",
-    type: "Многоразовый",
-    lastLogin: "2023-06-02",
-  },
-  {
-    id: 3,
-    firstName: "Мария",
-    lastName: "Сидорова",
-    iin: "456789012345",
-    phoneNumber: "+74567890123",
-    company: "ИП Семакина",
-    position: "Бухгалтер",
-    type: "Временный",
-    lastLogin: "2023-06-04",
-  },
-];
-
-mock.onGet("/cards").reply(200, cards);
 
 export default {
   name: "App",

@@ -1,102 +1,121 @@
 <template>
-  <div id="app"></div>
-  <div class="container">
+  <div class="main-content">
     <h4>Отчет о посещениях</h4>
     <hr class="hr" />
-    <h5>Список для отчета</h5>
-    <div class="srch">
-      <input type="search" placeholder="ID" v-model="searchId" />
-      <input type="search" placeholder="ФИО" v-model="searchName" />
-      <input type="search" placeholder="Дата с" v-model="searchDateFrom" />
-      <input type="search" placeholder="Дата до" v-model="searchDateTo" />
-      <button @click="clearFilters">Очистить</button>
+    <div class="search-bar">
+      <input type="text" placeholder="ID" v-model="searchId" />
+      <input type="text" placeholder="ФИО" v-model="searchName" />
+      <input type="text" placeholder="Дата с" v-model="searchDateFrom" />
+      <input type="text" placeholder="Дата до" v-model="searchDateTo" />
+      <q-btn flat label="Очистить" @click="clearFilters" />
     </div>
 
-    <!-- Добавленная таблица -->
-    <table class="report-table">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Дата</th>
-          <th>ID</th>
-          <th>Посетитель</th>
-          <th>Вход</th>
-          <th>Направление</th>
-          <th>Сходство</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="visit in filteredVisits" :key="visit.id">
-          <td>#(photo)</td>
-          <td>{{ visit.dateTime }}</td>
-          <td>{{ visit.visitorId }}</td>
-          <td>{{ visit.visitorName }} ({{ visit.companyName }})</td>
-          <td>{{ visit.entrance }}</td>
-          <td>{{ visit.direction }}</td>
-          <td>{{ visit.similarity }}%</td>
-        </tr>
-      </tbody>
-    </table>
+    <q-table
+      :rows="filteredVisits"
+      :columns="columns"
+      row-key="id"
+      :rows-per-page-options="[10, 15, 20]"
+    >
+      <template v-slot:body-cell-entrance="{ props }">
+        {{ props.row.entrance }}
+      </template>
+      <template v-slot:body-cell-direction="{ props }">
+        {{ props.row.direction }}
+      </template>
+      <template v-slot:body-cell-similarity="{ props }">
+        {{ props.row.similarity }}%
+      </template>
+    </q-table>
   </div>
 </template>
-
 <script>
+import { mapState } from "vuex";
 import axios from "axios";
-import MockAdapter from "axios-mock-adapter";
-
-const mock = new MockAdapter(axios);
-
-const visits = [
-  {
-    id: 1,
-    dateTime: "2023-07-01 10:00",
-    visitorId: 1,
-    visitorName: "Иван Петров",
-    companyName: "ООО Road Construction",
-    entrance: "1A",
-    direction: "Внутрь",
-    similarity: 80,
-  },
-  {
-    id: 2,
-    dateTime: "2023-07-02 15:30",
-    visitorId: 2,
-    visitorName: "Анна Иванова",
-    companyName: "АО Kcell",
-    entrance: "2B",
-    direction: "Наружу",
-    similarity: 95,
-  },
-  // Добавьте остальные данные о посещениях по аналогии
-];
-
-mock.onGet("/visits").reply(200, visits);
 
 export default {
+  name: "UserVisits",
   data() {
     return {
       searchId: "",
       searchName: "",
       searchDateFrom: "",
       searchDateTo: "",
+      columns: [
+        {
+          name: "id",
+          required: true,
+          label: "ID",
+          align: "left",
+          field: "id",
+          sortable: true,
+        },
+        {
+          name: "dateTime",
+          required: true,
+          label: "Дата",
+          align: "left",
+          field: "dateTime",
+          sortable: true,
+        },
+        {
+          name: "visitorId",
+          required: true,
+          label: "Id посетителя",
+          align: "left",
+          field: "visitorId",
+          sortable: true,
+        },
+        {
+          name: "visitorName",
+          required: true,
+          label: "Посетитель",
+          align: "left",
+          field: "visitorName",
+          sortable: true,
+        },
+        {
+          name: "entrance",
+          required: true,
+          label: "Вход",
+          align: "left",
+          field: "entrance",
+          sortable: true,
+        },
+        {
+          name: "direction",
+          required: true,
+          label: "Направление",
+          align: "left",
+          field: "direction",
+          sortable: true,
+        },
+        {
+          name: "similarity",
+          required: true,
+          label: "Сходство",
+          align: "left",
+          field: "similarity",
+          sortable: true,
+        },
+      ],
     };
   },
+
   computed: {
+    ...mapState(["visits"]),
     filteredVisits() {
-      return visits.filter((visit) => {
-        const idMatch =
-          visit.visitorId.toString().toLowerCase() ===
-          this.searchId.toLowerCase();
-        const nameMatch = visit.visitorName
-          .toLowerCase()
-          .includes(this.searchName.toLowerCase());
-        const dateMatchFrom =
-          !this.searchDateFrom ||
-          visit.dateTime >= new Date(this.searchDateFrom).toISOString();
-        const dateMatchTo =
-          !this.searchDateTo ||
-          visit.dateTime <= new Date(this.searchDateTo).toISOString();
-        return idMatch && nameMatch && dateMatchFrom && dateMatchTo;
+      return this.visits.filter((visit) => {
+        const queryId = this.searchId.toLowerCase();
+        const queryName = this.searchName.toLowerCase();
+        const queryDateFrom = this.searchDateFrom.toLowerCase();
+        const queryDateTo = this.searchDateTo.toLowerCase();
+
+        return (
+          visit.id.toString().includes(queryId) &&
+          visit.visitorName.toLowerCase().includes(queryName) &&
+          visit.dateTime.includes(queryDateFrom) &&
+          visit.dateTime.includes(queryDateTo)
+        );
       });
     },
   },
@@ -111,41 +130,27 @@ export default {
 };
 </script>
 
-<style>
-.container {
-  padding: 15px;
-}
-
-.srch {
-  display: flex;
-  gap: 40px;
-  justify-content: flex-start;
-}
-
-.hr {
-  background-color: orange;
-  height: 4px;
-  border: none;
-}
-
-.report-table {
+<style scoped>
+.main-content {
   width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
+  padding: 30px;
 }
 
-.report-table th,
-.report-table td {
-  padding: 10px;
-  border: 1px solid #ccc;
-  text-align: left;
+.search-bar {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 15px;
 }
 
-.report-table th {
-  background-color: #f2f2f2;
+.clear-button {
+  margin-top: 7px;
 }
 
-.report-table tbody tr:nth-child(even) {
-  background-color: #f9f9f9;
+.q-table__container {
+  overflow-x: auto;
+}
+
+.q-table__middle.scroll {
+  height: calc(100vh - 250px);
 }
 </style>
