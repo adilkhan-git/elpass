@@ -82,7 +82,6 @@ const visits = [
     direction: "Внутрь",
     similarity: 70,
   },
-
   {
     id: 4,
     dateTime: "2023-07-04 11:30",
@@ -133,7 +132,6 @@ const visits = [
     direction: "Внутрь",
     similarity: 93,
   },
-
   {
     id: 9,
     dateTime: "2023-07-04 11:30",
@@ -171,6 +169,9 @@ export default createStore({
     setVisits(state, visits) {
       state.visits = visits;
     },
+    addCard(state, card) {
+      state.cards.push(card);
+    },
   },
   actions: {
     fetchCards({ commit }) {
@@ -188,6 +189,16 @@ export default createStore({
         .get("/visits")
         .then((response) => {
           commit("setVisits", response.data);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+    addCard({ commit }, card) {
+      axios
+        .post("/cards", card)
+        .then((response) => {
+          commit("addCard", response.data);
         })
         .catch((error) => {
           console.error(error);

@@ -7,7 +7,7 @@
         class="add-visit-button"
         color="primary"
         label="Добавить посещение"
-        @click="openModal"
+        @click="showModal = true"
       ></q-btn>
 
       <div class="search-bar">
@@ -28,69 +28,82 @@
       </div>
     </div>
 
-    <!-- Модальное окно -->
-    <div class="modal" v-if="showModal">
-      <div class="modal-content">
-        <h2>Заполните данные посещения</h2>
-        <form @submit.prevent="addVisit">
-          <input
-            type="text"
-            v-model="newVisit.firstName"
-            placeholder="Имя"
-            required
-          />
-          <input
-            type="text"
-            v-model="newVisit.lastName"
-            placeholder="Фамилия"
-            required
-          />
-          <input
-            type="text"
-            v-model="newVisit.iin"
-            placeholder="ИИН"
-            required
-          />
-          <input
-            type="text"
-            v-model="newVisit.phoneNumber"
-            placeholder="Телефон"
-            required
-          />
-          <input
-            type="text"
-            v-model="newVisit.company"
-            placeholder="Компания"
-            required
-          />
-          <input
-            type="text"
-            v-model="newVisit.position"
-            placeholder="Должность"
-            required
-          />
-          <input
-            type="text"
-            v-model="newVisit.type"
-            placeholder="Тип"
-            required
-          />
-          <button type="submit">Сохранить</button>
-          <button @click="closeModal">Отмена</button>
-        </form>
-      </div>
-    </div>
+    <q-dialog v-model="showModal" position="standard" @hide="resetForm">
+      <q-card>
+        <q-card-section>
+          <h2>Заполните данные посещения</h2>
+          <q-form @submit.prevent="addVisit">
+            <q-input
+              v-model="newVisit.firstName"
+              label="Имя"
+              required
+            ></q-input>
+            <q-input
+              v-model="newVisit.lastName"
+              label="Фамилия"
+              required
+            ></q-input>
+            <q-input v-model="newVisit.iin" label="ИИН" required></q-input>
+            <q-input
+              v-model="newVisit.phoneNumber"
+              label="Телефон"
+              required
+            ></q-input>
+            <q-input
+              v-model="newVisit.company"
+              label="Компания"
+              required
+            ></q-input>
+            <q-input
+              v-model="newVisit.position"
+              label="Должность"
+              required
+            ></q-input>
+            <q-input v-model="newVisit.type" label="Тип" required></q-input>
+            <q-card-actions align="right">
+              <q-btn
+                color="primary"
+                label="Сохранить"
+                type="submit"
+                @click="showModal = false"
+              ></q-btn>
+              <q-btn
+                color="negative"
+                label="Отмена"
+                @click="showModal = false"
+              ></q-btn>
+            </q-card-actions>
+          </q-form>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 
 <script>
 import VisitorCard from "../components/VisitorCard.vue";
 import axios from "axios";
+import {
+  QBtn,
+  QInput,
+  QDialog,
+  QCard,
+  QCardSection,
+  QForm,
+  QCardActions,
+} from "quasar";
 
 export default {
   name: "App",
   components: {
     VisitorCard,
+    QBtn,
+    QInput,
+    QDialog,
+    QCard,
+    QCardSection,
+    QForm,
+    QCardActions,
   },
   data() {
     return {
