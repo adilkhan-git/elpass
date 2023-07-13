@@ -2,6 +2,7 @@
   <div class="main-content">
     <h4>Отчет о посещениях</h4>
     <hr class="hr" />
+
     <div class="search-bar">
       <input type="text" placeholder="ID" v-model="searchId" />
       <input type="text" placeholder="ФИО" v-model="searchName" />
@@ -10,27 +11,34 @@
       <q-btn flat label="Очистить" @click="clearFilters" />
     </div>
 
-    <q-table
-      :rows="filteredVisits"
-      :columns="columns"
-      row-key="id"
-      :rows-per-page-options="[10, 15, 20]"
-    >
-      <template v-slot:body-cell-entrance="{ props }">
+    <q-table :rows="filteredVisits" :columns="columns" row-key="id">
+      <template v-slot:body-cell[id]="{ props }">
+        {{ props.row.id }}
+      </template>
+      <template v-slot:body-cell[dateTime]="{ props }">
+        {{ props.row.dateTime }}
+      </template>
+      <template v-slot:body-cell[visitorId]="{ props }">
+        {{ props.row.visitorId }}
+      </template>
+      <template v-slot:body-cell[visitorName]="{ props }">
+        {{ props.row.visitorName }}
+      </template>
+      <template v-slot:body-cell[entrance]="{ props }">
         {{ props.row.entrance }}
       </template>
-      <template v-slot:body-cell-direction="{ props }">
+      <template v-slot:body-cell[direction]="{ props }">
         {{ props.row.direction }}
       </template>
-      <template v-slot:body-cell-similarity="{ props }">
+      <template v-slot:body-cell[similarity]="{ props }">
         {{ props.row.similarity }}%
       </template>
     </q-table>
   </div>
 </template>
+
 <script>
 import { mapState } from "vuex";
-import axios from "axios";
 
 export default {
   name: "UserVisits",
@@ -40,7 +48,12 @@ export default {
       searchName: "",
       searchDateFrom: "",
       searchDateTo: "",
-      columns: [
+    };
+  },
+  computed: {
+    ...mapState(["visits"]),
+    columns() {
+      return [
         {
           name: "id",
           required: true,
@@ -97,14 +110,10 @@ export default {
           field: "similarity",
           sortable: true,
         },
-      ],
-    };
-  },
-
-  computed: {
-    ...mapState(["visits"]),
+      ];
+    },
     filteredVisits() {
-      return this.visits.filter((visit) => {
+      const filtered = this.visits.filter((visit) => {
         const queryId = this.searchId.toLowerCase();
         const queryName = this.searchName.toLowerCase();
         const queryDateFrom = this.searchDateFrom.toLowerCase();
@@ -117,9 +126,17 @@ export default {
           visit.dateTime.includes(queryDateTo)
         );
       });
+
+      return filtered;
     },
   },
+  created() {
+    this.fetchVisits();
+  },
   methods: {
+    fetchVisits() {
+      this.$store.dispatch("fetchVisits");
+    },
     clearFilters() {
       this.searchId = "";
       this.searchName = "";
@@ -140,10 +157,6 @@ export default {
   margin-bottom: 20px;
   display: flex;
   gap: 15px;
-}
-
-.clear-button {
-  margin-top: 7px;
 }
 
 .q-table__container {
