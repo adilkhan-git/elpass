@@ -72,7 +72,7 @@ const visits = [
     direction: "Наружу",
     similarity: 95,
   },
-  // Добавьте остальные данные о посещениях по аналогии
+  
 ];
 
 mock.onGet("/cards").reply(200, cards);
