@@ -8,7 +8,13 @@
       <input type="text" placeholder="ФИО" v-model="searchName" />
       <input type="text" placeholder="Дата с" v-model="searchDateFrom" />
       <input type="text" placeholder="Дата до" v-model="searchDateTo" />
-      <q-btn flat label="Очистить" @click="clearFilters" />
+      <q-btn color="primary" label="Очистить" @click="clearFilters" />
+      <!-- <q-btn
+        class="add-visit-button"
+        color="primary"
+        label="Добавить посещение"
+        @click="openModal"
+      ></q-btn> -->
     </div>
 
     <q-table :rows="filteredVisits" :columns="columns" row-key="id">

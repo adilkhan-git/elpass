@@ -130,4 +130,8 @@ export default defineComponent({
   background-color: green;
   margin-right: 5px;
 }
+
+.q-drawer {
+  background-color: rgb(230, 230, 230);
+}
 </style>

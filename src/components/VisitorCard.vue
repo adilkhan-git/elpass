@@ -1,48 +1,55 @@
 <template>
-  <div class="card">
-    <div class="card-header">
+  <q-card class="card">
+    <q-card-section class="card-header">
       <div class="visitor-info">
         <div class="visitor-name">
           {{ visitor.firstName }} {{ visitor.lastName }}
         </div>
         <div class="visitor-iin">ИИН: {{ visitor.iin }}</div>
         <div class="visitor-phone">
-          <font-awesome-icon :icon="['fas', 'phone']" />{{
-            visitor.phoneNumber
-          }}
+          <q-icon name="phone" />{{ visitor.phoneNumber }}
         </div>
       </div>
       <div class="company-info">
         <div class="company-name">{{ visitor.company }}</div>
         <div class="company-position">{{ visitor.position }}</div>
       </div>
-    </div>
+    </q-card-section>
 
-    <div class="visitor-id">ID: {{ visitor.id }}</div>
-    <div class="visitor-type">{{ visitor.type }}</div>
-    <div class="last-login">
-      <font-awesome-icon :icon="['fas', 'clock']" class="clock-icon" />
-      {{ formatDateTime(new Date().toISOString()) }}
-    </div>
+    <q-card-section class="card-body">
+      <div class="id-type-last-login">
+        <div class="visitor-id">ID: {{ visitor.id }}</div>
+        <div class="visitor-type">{{ visitor.type }}</div>
+        <div class="last-login">
+          <q-icon name="access_time" class="clock-icon" />
+          {{ formatDateTime(new Date().toISOString()) }}
+        </div>
+      </div>
+    </q-card-section>
 
-    <div class="delete-icon" @click="deleteVisitor(visitor.id)">
-      <font-awesome-icon
-        :icon="['fas', 'trash-alt']"
-        class="delete-icon-style"
+    <q-card-actions align="right">
+      <q-btn
+        flat
+        dense
+        round
+        icon="delete"
+        color="negative"
+        @click="deleteVisitor(visitor.id)"
       />
-    </div>
-  </div>
+    </q-card-actions>
+  </q-card>
 </template>
 
 <script>
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { library } from "@fortawesome/fontawesome-svg-core";
-import { fas } from "@fortawesome/free-solid-svg-icons";
+import { QCard, QCardSection, QCardActions, QBtn, QIcon } from "quasar";
 
-library.add(fas);
 export default {
   components: {
-    FontAwesomeIcon,
+    QCard,
+    QCardSection,
+    QCardActions,
+    QBtn,
+    QIcon,
   },
   name: "VisitorCard",
   props: {
@@ -72,98 +79,98 @@ export default {
 
 <style>
 .card {
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 10px;
-  margin: 5px;
+  margin: 10px;
+  width: 100%;
   display: flex;
-  flex-wrap: wrap;
   justify-content: space-between;
-  width: 1560px;
-  background-color: rgb(245, 244, 244);
-  height: 100px;
 }
 
 .card-header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
-  flex-basis: 16%;
   align-items: center;
 }
 
 .visitor-info {
   flex-grow: 1;
-  flex-basis: 20%;
-  margin-right: 190px;
-  margin-left: 10px;
-  align-content: center;
-  color: rgb(255, 166, 0);
+  margin-right: 10px;
+  color: #ffa600;
 }
 
 .visitor-name {
   font-weight: bold;
-  padding-top: 5px;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 5px;
 }
 
 .visitor-iin,
 .visitor-phone {
-  padding-top: 5px;
   color: #666;
   white-space: nowrap;
-}
-
-.delete-icon {
-  color: red;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 5px;
 }
 
 .company-info {
   flex-grow: 1;
   text-align: left;
-  flex-basis: 20%;
-  margin-left: 100px;
-  margin-right: 200px;
+  margin-left: 120px;
 }
 
 .company-name {
   font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 5px;
 }
 
 .company-position {
   color: #666;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 5px;
 }
 
 .card-body {
-  font-size: 14px;
-  flex-basis: 20%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.visitor-id {
+.id-type-last-login {
+  display: flex;
+  justify-content: space-between;
+  gap: 100px;
+}
+
+.visitor-id,
+.visitor-type,
+.last-login {
   margin-bottom: 5px;
-  flex-basis: 16%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .visitor-type {
   font-weight: bold;
-  flex-basis: 16%;
 }
 
 .last-login {
   color: #666;
-  margin-bottom: 10px;
-  flex-basis: 16%;
 }
 
-.delete-button {
-  background-color: #f44336;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  padding: 5px 10px;
-  cursor: pointer;
-  flex-basis: 5%;
-  margin-top: 10px;
+.clock-icon {
+  margin-right: 5px;
+}
+
+.delete-icon-style {
+  font-size: 16px;
 }
 
 .delete-icon:hover {
