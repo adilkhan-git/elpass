@@ -81,6 +81,48 @@
 
 <script>
 import VisitorCard from "../components/VisitorCard.vue";
+import axios from "axios";
+import MockAdapter from "axios-mock-adapter";
+
+const mock = new MockAdapter(axios);
+
+const cards = [
+  {
+    id: 1,
+    firstName: "Иван",
+    lastName: "Петров",
+    iin: "791225758965",
+    phoneNumber: "+77478889977",
+    company: "ООО Road Construction",
+    position: "Менеджер",
+    type: "Многоразовый",
+    lastLogin: "2023-05-31",
+  },
+  {
+    id: 2,
+    firstName: "Анна",
+    lastName: "Иванова",
+    iin: "987654321098",
+    phoneNumber: "+79876543210",
+    company: "АО Kcell",
+    position: "Разработчик",
+    type: "Многоразовый",
+    lastLogin: "2023-06-02",
+  },
+  {
+    id: 3,
+    firstName: "Мария",
+    lastName: "Сидорова",
+    iin: "456789012345",
+    phoneNumber: "+74567890123",
+    company: "ИП Семакина",
+    position: "Бухгалтер",
+    type: "Временный",
+    lastLogin: "2023-06-04",
+  },
+];
+
+mock.onGet("/cards").reply(200, cards);
 
 export default {
   name: "App",
@@ -89,47 +131,12 @@ export default {
   },
   data() {
     return {
-      visitors: [
-        {
-          id: 1,
-          firstName: "Иван",
-          lastName: "Петров",
-          iin: "791225758965",
-          phoneNumber: "+77478889977",
-          company: "ООО Road Construction",
-          position: "Менеджер",
-          type: "Многоразовый",
-          lastLogin: "2023-05-31",
-        },
-        {
-          id: 2,
-          firstName: "Анна",
-          lastName: "Иванова",
-          iin: "987654321098",
-          phoneNumber: "+79876543210",
-          company: "АО Kcell",
-          position: "Разработчик",
-          type: "Многоразовый",
-          lastLogin: "2023-06-02",
-        },
-        {
-          id: 3,
-          firstName: "Мария",
-          lastName: "Сидорова",
-          iin: "456789012345",
-          phoneNumber: "+74567890123",
-          company: "ИП Семакина",
-          position: "Бухгалтер",
-          type: "Временный",
-          lastLogin: "2023-06-04",
-        },
-      ],
+      visitors: [],
       searchName: "",
       searchLastName: "",
       searchId: "",
       searchPhone: "",
       searchIin: "",
-
       showModal: false,
       newVisit: {
         firstName: "",
@@ -141,6 +148,9 @@ export default {
         type: "",
       },
     };
+  },
+  created() {
+    this.loadCards();
   },
   computed: {
     filteredVisitors() {
@@ -200,6 +210,16 @@ export default {
       };
       this.visitors.push(newVisitor);
       this.closeModal();
+    },
+    loadCards() {
+      axios
+        .get("/cards")
+        .then((response) => {
+          this.visitors = response.data;
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     },
   },
 };
