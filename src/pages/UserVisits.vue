@@ -9,12 +9,6 @@
       <input type="text" placeholder="Дата с" v-model="searchDateFrom" />
       <input type="text" placeholder="Дата до" v-model="searchDateTo" />
       <q-btn color="primary" label="Очистить" @click="clearFilters" />
-      <!-- <q-btn
-        class="add-visit-button"
-        color="primary"
-        label="Добавить посещение"
-        @click="openModal"
-      ></q-btn> -->
     </div>
 
     <q-table :rows="filteredVisits" :columns="columns" row-key="id">
@@ -44,7 +38,8 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapActions, mapState } from "vuex";
+import axios from "axios";
 
 export default {
   name: "UserVisits",
@@ -57,7 +52,9 @@ export default {
     };
   },
   computed: {
-    ...mapState(["visits"]),
+    ...mapState({
+      visits: (state) => state.visits,
+    }),
     columns() {
       return [
         {
@@ -140,8 +137,16 @@ export default {
     this.fetchVisits();
   },
   methods: {
-    fetchVisits() {
-      this.$store.dispatch("fetchVisits");
+    ...mapActions(["fetchVisits"]),
+    loadVisits() {
+      axios
+        .get("/visits")
+        .then((response) => {
+          this.visits = response.data;
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     },
     clearFilters() {
       this.searchId = "";
