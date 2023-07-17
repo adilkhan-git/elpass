@@ -65,12 +65,12 @@
                 color="primary"
                 label="Сохранить"
                 type="submit"
-                @click="showModal = false"
+                @click="saveVisit"
               ></q-btn>
               <q-btn
                 color="negative"
                 label="Отмена"
-                @click="showModal = false"
+                @click="closeModal"
               ></q-btn>
             </q-card-actions>
           </q-form>
@@ -81,8 +81,9 @@
 </template>
 
 <script>
+import { mapState, mapActions, mapMutations } from "vuex";
 import VisitorCard from "../components/VisitorCard.vue";
-import axios from "axios";
+
 import {
   QBtn,
   QInput,
@@ -94,7 +95,7 @@ import {
 } from "quasar";
 
 export default {
-  name: "App",
+  name: "CardPage",
   components: {
     VisitorCard,
     QBtn,
@@ -107,7 +108,6 @@ export default {
   },
   data() {
     return {
-      visitors: [],
       searchName: "",
       searchLastName: "",
       searchId: "",
@@ -125,37 +125,40 @@ export default {
       },
     };
   },
-  created() {
-    this.loadCards();
-  },
   computed: {
+    ...mapState(["cards"]),
+
     filteredVisitors() {
-      return this.visitors.filter((visitor) => {
-        const name =
-          visitor.firstName.toLowerCase() +
-          " " +
-          visitor.lastName.toLowerCase();
+      return this.cards.filter((visitor) => {
         const queryName = this.searchName.toLowerCase();
         const queryLastName = this.searchLastName.toLowerCase();
         const queryId = this.searchId.toLowerCase();
         const queryPhone = this.searchPhone.toLowerCase();
         const queryIin = this.searchIin.toLowerCase();
+        const nameMatches = visitor.firstName.toLowerCase().includes(queryName);
+        const lastNameMatches = visitor.lastName
+          .toLowerCase()
+          .includes(queryLastName);
+        const idMatches = visitor.id.toString().includes(queryId);
+        const phoneMatches = visitor.phoneNumber
+          .toLowerCase()
+          .includes(queryPhone);
+        const iinMatches = visitor.iin.includes(queryIin);
         return (
-          name.includes(queryName) &&
-          visitor.lastName.toLowerCase().includes(queryLastName) &&
-          visitor.id.toString().includes(queryId) &&
-          visitor.phoneNumber.toLowerCase().includes(queryPhone) &&
-          visitor.iin.includes(queryIin)
+          nameMatches &&
+          lastNameMatches &&
+          idMatches &&
+          phoneMatches &&
+          iinMatches
         );
       });
     },
   },
   methods: {
+    ...mapActions(["fetchCards", "addCard"]),
+    ...mapMutations(["deleteCard"]),
     deleteVisitor(id) {
-      this.visitors = this.visitors.filter((visitor) => visitor.id !== id);
-    },
-    openModal() {
-      this.showModal = true;
+      this.deleteCard(id);
     },
     closeModal() {
       this.showModal = false;
@@ -172,9 +175,8 @@ export default {
         type: "",
       };
     },
-    addVisit() {
-      const newVisitor = {
-        id: this.visitors.length + 1,
+    saveVisit() {
+      const newCard = {
         firstName: this.newVisit.firstName,
         lastName: this.newVisit.lastName,
         iin: this.newVisit.iin,
@@ -182,21 +184,22 @@ export default {
         company: this.newVisit.company,
         position: this.newVisit.position,
         type: this.newVisit.type,
-        lastLogin: new Date().toISOString().split("T")[0],
       };
-      this.visitors.push(newVisitor);
-      this.closeModal();
-    },
-    loadCards() {
-      axios
-        .get("/cards")
-        .then((response) => {
-          this.visitors = response.data;
+      this.addCard(newCard)
+        .then(() => {
+          console.log("Карточка добавлена");
+          this.closeModal();
         })
         .catch((error) => {
-          console.error(error);
+          console.error("Ошибка");
         });
     },
+    addVisit() {
+      this.saveVisit();
+    },
+  },
+  created() {
+    this.fetchCards();
   },
 };
 </script>

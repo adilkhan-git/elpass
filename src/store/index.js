@@ -82,80 +82,20 @@ const visits = [
     direction: "Внутрь",
     similarity: 70,
   },
-  {
-    id: 4,
-    dateTime: "2023-07-04 11:30",
-    visitorId: 4,
-    visitorName: "Петр Иванов",
-    companyName: "ООО Строитель",
-    entrance: "Entrance1",
-    direction: "Наружу",
-    similarity: 85,
-  },
-  {
-    id: 5,
-    dateTime: "2023-07-05 09:45",
-    visitorId: 5,
-    visitorName: "Елена Петрова",
-    companyName: "АО Телеком",
-    entrance: "Entrance1",
-    direction: "Внутрь",
-    similarity: 90,
-  },
-  {
-    id: 6,
-    dateTime: "2023-07-01 10:13",
-    visitorId: 6,
-    visitorName: "Иван Петров",
-    companyName: "ООО Road Construction",
-    entrance: "Entrance1",
-    direction: "Внутрь",
-    similarity: 95,
-  },
-  {
-    id: 7,
-    dateTime: "2023-07-02 15:30",
-    visitorId: 7,
-    visitorName: "Казбек Азаматов",
-    companyName: "АО Kcell",
-    entrance: "Entrance1",
-    direction: "Наружу",
-    similarity: 99,
-  },
-  {
-    id: 8,
-    dateTime: "2023-07-03 14:15",
-    visitorId: 8,
-    visitorName: "Юлия Семакина",
-    companyName: "ИП Семакина",
-    entrance: "Entrance1",
-    direction: "Внутрь",
-    similarity: 93,
-  },
-  {
-    id: 9,
-    dateTime: "2023-07-04 11:30",
-    visitorId: 9,
-    visitorName: "Петр Иванов",
-    companyName: "ООО Строитель",
-    entrance: "Entrance1",
-    direction: "Наружу",
-    similarity: 89,
-  },
-  {
-    id: 10,
-    dateTime: "2023-07-05 09:45",
-    visitorId: 10,
-    visitorName: "Азамат Мауленов",
-    companyName: "АО Телеком",
-    entrance: "Entrance1",
-    direction: "Внутрь",
-    similarity: 94,
-  },
 ];
 
 mock.onGet("/cards").reply(200, cards);
 mock.onGet("/visits").reply(200, visits);
+mock.onPost("/cards").reply((config) => {
+  const newCard = JSON.parse(config.data);
+  const cardId = cards.length + 1;
+  newCard.id = cardId;
+  console.log(cards);
+  cards.push(newCard);
+  console.log("pushed");
+  return [201, newCard];
+});
+mock.onDelete(/\/cards\/\d+/).reply(200);
 
 export default createStore({
   state: {
@@ -171,6 +111,9 @@ export default createStore({
     },
     addCard(state, card) {
       state.cards.push(card);
+    },
+    deleteCard(state, id) {
+      state.cards = state.cards.filter((card) => card.id !== id);
     },
   },
   actions: {
@@ -195,10 +138,25 @@ export default createStore({
         });
     },
     addCard({ commit }, card) {
+      return new Promise((resolve, reject) => {
+        axios
+          .post("/cards", card)
+          .then((response) => {
+            const newCard = response.data;
+            commit("addCard", newCard);
+            resolve(newCard);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    },
+
+    deleteCard({ commit }, id) {
       axios
-        .post("/cards", card)
-        .then((response) => {
-          commit("addCard", response.data);
+        .delete(`/cards/${id}`)
+        .then(() => {
+          commit("deleteCard", id);
         })
         .catch((error) => {
           console.error(error);
