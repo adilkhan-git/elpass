@@ -3,23 +3,70 @@
     <q-card-section class="card-header">
       <div class="visitor-info">
         <div class="visitor-name">
-          {{ visitor.firstName }} {{ visitor.lastName }}
+          <q-input
+            v-if="isEditing"
+            v-model="editedVisitor.firstName"
+            placeholder="First Name"
+          />
+          <q-input
+            v-if="isEditing"
+            v-model="editedVisitor.lastName"
+            placeholder="Last Name"
+          />
+          <template v-else
+            >{{ visitor.firstName }} {{ visitor.lastName }}</template
+          >
         </div>
-        <div class="visitor-iin">ИИН: {{ visitor.iin }}</div>
+        <div class="visitor-iin">
+          <q-input
+            v-if="isEditing"
+            v-model="editedVisitor.iin"
+            placeholder="ИИН"
+          />
+          <template v-else>ИИН: {{ visitor.iin }}</template>
+        </div>
         <div class="visitor-phone">
-          <q-icon name="phone" />{{ visitor.phoneNumber }}
+          <q-input
+            v-if="isEditing"
+            v-model="editedVisitor.phoneNumber"
+            placeholder="Phone Number"
+          />
+          <template v-else
+            ><q-icon name="phone" />{{ visitor.phoneNumber }}</template
+          >
         </div>
       </div>
       <div class="company-info">
-        <div class="company-name">{{ visitor.company }}</div>
-        <div class="company-position">{{ visitor.position }}</div>
+        <div class="company-name">
+          <q-input
+            v-if="isEditing"
+            v-model="editedVisitor.company"
+            placeholder="Company"
+          />
+          <template v-else>{{ visitor.company }}</template>
+        </div>
+        <div class="company-position">
+          <q-input
+            v-if="isEditing"
+            v-model="editedVisitor.position"
+            placeholder="Position"
+          />
+          <template v-else>{{ visitor.position }}</template>
+        </div>
       </div>
     </q-card-section>
 
     <q-card-section class="card-body">
       <div class="id-type-last-login">
         <div class="visitor-id">ID: {{ visitor.id }}</div>
-        <div class="visitor-type">{{ visitor.type }}</div>
+        <div class="visitor-type">
+          <q-input
+            v-if="isEditing"
+            v-model="editedVisitor.type"
+            placeholder="Type"
+          />
+          <template v-else>{{ visitor.type }}</template>
+        </div>
         <div class="last-login">
           <q-icon name="access_time" class="clock-icon" />
           {{ formatDateTime(new Date().toISOString()) }}
@@ -28,6 +75,14 @@
     </q-card-section>
 
     <q-card-actions align="right">
+      <q-btn
+        flat
+        dense
+        round
+        icon="edit"
+        color="orange"
+        @click="toggleEditing"
+      />
       <q-btn
         flat
         dense
@@ -41,7 +96,7 @@
 </template>
 
 <script>
-import { QCard, QCardSection, QCardActions, QBtn, QIcon } from "quasar";
+import { QCard, QCardSection, QCardActions, QBtn, QIcon, QInput } from "quasar";
 
 export default {
   components: {
@@ -50,6 +105,13 @@ export default {
     QCardActions,
     QBtn,
     QIcon,
+    QInput,
+  },
+  data() {
+    return {
+      isEditing: false,
+      editedVisitor: null,
+    };
   },
   name: "VisitorCard",
   props: {
@@ -59,6 +121,14 @@ export default {
     },
   },
   methods: {
+    toggleEditing() {
+      this.isEditing = !this.isEditing;
+      if (this.isEditing) {
+        this.editedVisitor = { ...this.visitor };
+      } else {
+        this.$emit("update", this.editedVisitor);
+      }
+    },
     deleteVisitor(id) {
       this.$emit("delete", id);
     },
@@ -146,6 +216,11 @@ export default {
   display: flex;
   justify-content: space-between;
   gap: 100px;
+}
+
+.q-input {
+  padding: 0;
+  margin: 0;
 }
 
 .visitor-id,

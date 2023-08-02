@@ -96,6 +96,17 @@ mock.onPost("/cards").reply((config) => {
   return [201, newCard];
 });
 mock.onDelete(/\/cards\/\d+/).reply(200);
+mock.onPut(/\/cards\/\d+/).reply((config) => {
+  const updatedCard = JSON.parse(config.data);
+  const cardIndex = cards.findIndex((card) => card.id === updatedCard.id);
+  if (cardIndex !== -1) {
+    cards[cardIndex] = updatedCard;
+    console.log("Card is updated");
+    return [200, updatedCard];
+  } else {
+    return [404, { message: "Card not found" }];
+  }
+});
 
 export default createStore({
   state: {
@@ -114,6 +125,19 @@ export default createStore({
     },
     deleteCard(state, id) {
       state.cards = state.cards.filter((card) => card.id !== id);
+    },
+    updateCard(state, updatedCard) {
+      return new Promise((resolve, reject) => {
+        const index = state.cards.findIndex(
+          (card) => card.id === updatedCard.id
+        );
+        if (index !== -1) {
+          state.cards.splice(index, 1, updatedCard);
+          resolve();
+        } else {
+          reject("Карточка не найдена");
+        }
+      });
     },
   },
   actions: {
@@ -161,6 +185,19 @@ export default createStore({
         .catch((error) => {
           console.error(error);
         });
+    },
+    updateCard({ commit }, updatedCard) {
+      return new Promise((resolve, reject) => {
+        axios
+          .put(`/cards/${updatedCard.id}`, updatedCard)
+          .then((response) => {
+            commit("updateCard", response.data);
+            resolve(response.data);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
     },
   },
   getters: {

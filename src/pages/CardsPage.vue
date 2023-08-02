@@ -24,6 +24,7 @@
           :key="visitor.id"
           :visitor="visitor"
           @delete="deleteVisitor(visitor.id)"
+          @update="updateVisitor"
         />
       </div>
     </div>
@@ -155,10 +156,13 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["fetchCards", "addCard"]),
+    ...mapActions(["fetchCards", "addCard", "updateCard"]),
     ...mapMutations(["deleteCard"]),
     deleteVisitor(id) {
       this.deleteCard(id);
+    },
+    updateVisitor(visitor) {
+      this.updateCard(visitor);
     },
     closeModal() {
       this.showModal = false;
