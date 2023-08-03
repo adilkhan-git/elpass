@@ -83,6 +83,29 @@ const visits = [
     similarity: 70,
   },
 ];
+const users = [
+  {
+    id: 1,
+    email: "admin@example.com",
+    password: "password123",
+    role: "admin",
+    phoneNumber: "+12345678901",
+  },
+  {
+    id: 2,
+    email: "operator@example.com",
+    password: "password123",
+    role: "operator",
+    phoneNumber: "+23456789012",
+  },
+  {
+    id: 3,
+    email: "employee@example.com",
+    password: "password123",
+    role: "employee",
+    phoneNumber: "+34567890123",
+  },
+];
 
 mock.onGet("/cards").reply(200, cards);
 mock.onGet("/visits").reply(200, visits);
@@ -107,13 +130,44 @@ mock.onPut(/\/cards\/\d+/).reply((config) => {
     return [404, { message: "Card not found" }];
   }
 });
+mock.onPost("/login").reply((config) => {
+  const { email, password } = JSON.parse(config.data);
+  const user = users.find(
+    (user) => user.email === email && user.password === password
+  );
+
+  if (user) {
+    return [
+      200,
+      {
+        user: {
+          id: user.id,
+          role: user.role,
+          email: user.email,
+          phoneNumber: user.phoneNumber,
+        },
+        token: "fake-jwt-token",
+      },
+    ];
+  } else {
+    return [400, { message: "Email or password is incorrect" }];
+  }
+});
 
 export default createStore({
   state: {
+    user: null,
+    token: null,
     cards: [],
     visits: [],
   },
   mutations: {
+    SET_USER(state, user) {
+      state.user = user;
+    },
+    SET_TOKEN(state, token) {
+      state.token = token;
+    },
     setCards(state, cards) {
       state.cards = cards;
     },
@@ -141,6 +195,20 @@ export default createStore({
     },
   },
   actions: {
+    async login({ commit }, user) {
+      console.log(user); 
+      const response = await axios.post("/login", {
+        email: user.email, 
+        password: user.password,
+      });
+      commit("SET_USER", response.data.user);
+      commit("SET_TOKEN", response.data.token);
+      return response;
+    },
+    logout({ commit }) {
+      commit("SET_USER", null);
+      commit("SET_TOKEN", null);
+    },
     fetchCards({ commit }) {
       axios
         .get("/cards")

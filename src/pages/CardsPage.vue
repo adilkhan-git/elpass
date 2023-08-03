@@ -4,6 +4,7 @@
       <h4>Карточки посетителей</h4>
       <hr class="hr" />
       <q-btn
+        v-if="isAdmin"
         class="add-visit-button"
         color="primary"
         label="Добавить посещение"
@@ -128,6 +129,14 @@ export default {
   },
   computed: {
     ...mapState(["cards"]),
+    isAdmin() {
+      return this.$store.state.user && this.$store.state.user.role === "admin";
+    },
+    isOperator() {
+      return (
+        this.$store.state.user && this.$store.state.user.role === "operator"
+      );
+    },
 
     filteredVisitors() {
       return this.cards.filter((visitor) => {
