@@ -86,22 +86,22 @@ const visits = [
 const users = [
   {
     id: 1,
-    email: "admin@example.com",
-    password: "password123",
+    email: "admin@gmail.com",
+    password: "admin",
     role: "admin",
     phoneNumber: "+12345678901",
   },
   {
     id: 2,
-    email: "operator@example.com",
-    password: "password123",
+    email: "operator@gmail.com",
+    password: "operator",
     role: "operator",
     phoneNumber: "+23456789012",
   },
   {
     id: 3,
-    email: "employee@example.com",
-    password: "password123",
+    email: "employee@gmail.com",
+    password: "employee",
     role: "employee",
     phoneNumber: "+34567890123",
   },
@@ -196,9 +196,9 @@ export default createStore({
   },
   actions: {
     async login({ commit }, user) {
-      console.log(user); 
+      console.log(user);
       const response = await axios.post("/login", {
-        email: user.email, 
+        email: user.email,
         password: user.password,
       });
       commit("SET_USER", response.data.user);

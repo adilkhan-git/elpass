@@ -4,7 +4,7 @@
       <h4>Карточки посетителей</h4>
       <hr class="hr" />
       <q-btn
-        v-if="isAdmin"
+        v-if="isAdmin || isOperator"
         class="add-visit-button"
         color="primary"
         label="Добавить посещение"
@@ -135,6 +135,11 @@ export default {
     isOperator() {
       return (
         this.$store.state.user && this.$store.state.user.role === "operator"
+      );
+    },
+    isEmployee() {
+      return (
+        this.$store.state.user && this.$store.state.user.role === "employee"
       );
     },
 

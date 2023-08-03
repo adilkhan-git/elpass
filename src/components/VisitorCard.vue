@@ -76,6 +76,7 @@
 
     <q-card-actions align="right">
       <q-btn
+        v-if="isAdmin"
         flat
         dense
         round
@@ -84,6 +85,7 @@
         @click="toggleEditing"
       />
       <q-btn
+        v-if="isAdmin"
         flat
         dense
         round
@@ -112,6 +114,21 @@ export default {
       isEditing: false,
       editedVisitor: null,
     };
+  },
+  computed: {
+    isAdmin() {
+      return this.$store.state.user && this.$store.state.user.role === "admin";
+    },
+    isOperator() {
+      return (
+        this.$store.state.user && this.$store.state.user.role === "operator"
+      );
+    },
+    isEmployee() {
+      return (
+        this.$store.state.user && this.$store.state.user.role === "employee"
+      );
+    },
   },
   name: "VisitorCard",
   props: {
