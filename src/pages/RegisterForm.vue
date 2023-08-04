@@ -1,5 +1,5 @@
 <template>
-  <h1>Gafasdasd</h1>
+  <h1>Reg form</h1>
 </template>
 
 <script>

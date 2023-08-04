@@ -150,41 +150,41 @@ mock.onPost("/login").reply((config) => {
   }
 });
 
-mock.onPost("/register").reply((config) => {
-  const { email, password, confirmPassword, role } = JSON.parse(config.data);
+// mock.onPost("/register").reply((config) => {
+//   const { email, password, confirmPassword, role } = JSON.parse(config.data);
 
-  // Проверить существование пользователя с тем же адресом электронной почты
-  const existingUser = users.find((user) => user.email === email);
-  if (existingUser) {
-    return [400, { message: "User already exists" }];
-  }
+//   // Проверить существование пользователя с тем же адресом электронной почты
+//   const existingUser = users.find((user) => user.email === email);
+//   if (existingUser) {
+//     return [400, { message: "User already exists" }];
+//   }
 
-  // Проверить, совпадают ли пароль и подтверждение пароля
-  if (password !== confirmPassword) {
-    return [400, { message: "Password and Confirm Password do not match" }];
-  }
+//   // Проверить, совпадают ли пароль и подтверждение пароля
+//   if (password !== confirmPassword) {
+//     return [400, { message: "Password and Confirm Password do not match" }];
+//   }
 
-  const id = users.length + 1;
-  const newUser = {
-    id,
-    email,
-    password,
-    role,
-  };
-  users.push(newUser);
+//   const id = users.length + 1;
+//   const newUser = {
+//     id,
+//     email,
+//     password,
+//     role,
+//   };
+//   users.push(newUser);
 
-  return [
-    200,
-    {
-      user: {
-        id: newUser.id,
-        role: newUser.role,
-        email: newUser.email,
-      },
-      token: "fake-jwt-token",
-    },
-  ];
-});
+//   return [
+//     200,
+//     {
+//       user: {
+//         id: newUser.id,
+//         role: newUser.role,
+//         email: newUser.email,
+//       },
+//       token: "fake-jwt-token",
+//     },
+//   ];
+// });
 
 export default createStore({
   state: {
@@ -241,24 +241,24 @@ export default createStore({
       commit("SET_USER", null);
       commit("SET_TOKEN", null);
     },
-    async register({ commit }, user) {
-      const response = await axios.post("/register", {
-        email: user.email,
-        password: user.password,
-        confirmPassword: user.confirmPassword,
-        role: user.role,
-        phoneNumber: user.phoneNumber,
-      });
+    // async register({ commit }, user) {
+    //   const response = await axios.post("/register", {
+    //     email: user.email,
+    //     password: user.password,
+    //     confirmPassword: user.confirmPassword,
+    //     role: user.role,
+    //     phoneNumber: user.phoneNumber,
+    //   });
 
-      if (response.data.message) {
-        throw new Error(response.data.message);
-      }
+    //   if (response.data.message) {
+    //     throw new Error(response.data.message);
+    //   }
 
-      commit("SET_USER", response.data.user);
-      commit("SET_TOKEN", response.data.token);
+    //   commit("SET_USER", response.data.user);
+    //   commit("SET_TOKEN", response.data.token);
 
-      return response;
-    },
+    //   return response;
+    // },
 
     fetchCards({ commit }) {
       axios
