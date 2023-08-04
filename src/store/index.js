@@ -89,21 +89,18 @@ const users = [
     email: "admin@gmail.com",
     password: "admin",
     role: "admin",
-    phoneNumber: "+12345678901",
   },
   {
     id: 2,
     email: "operator@gmail.com",
     password: "operator",
     role: "operator",
-    phoneNumber: "+23456789012",
   },
   {
     id: 3,
     email: "employee@gmail.com",
     password: "employee",
     role: "employee",
-    phoneNumber: "+34567890123",
   },
 ];
 
@@ -144,7 +141,6 @@ mock.onPost("/login").reply((config) => {
           id: user.id,
           role: user.role,
           email: user.email,
-          phoneNumber: user.phoneNumber,
         },
         token: "fake-jwt-token",
       },
@@ -152,6 +148,42 @@ mock.onPost("/login").reply((config) => {
   } else {
     return [400, { message: "Email or password is incorrect" }];
   }
+});
+
+mock.onPost("/register").reply((config) => {
+  const { email, password, confirmPassword, role } = JSON.parse(config.data);
+
+  // Проверить существование пользователя с тем же адресом электронной почты
+  const existingUser = users.find((user) => user.email === email);
+  if (existingUser) {
+    return [400, { message: "User already exists" }];
+  }
+
+  // Проверить, совпадают ли пароль и подтверждение пароля
+  if (password !== confirmPassword) {
+    return [400, { message: "Password and Confirm Password do not match" }];
+  }
+
+  const id = users.length + 1;
+  const newUser = {
+    id,
+    email,
+    password,
+    role,
+  };
+  users.push(newUser);
+
+  return [
+    200,
+    {
+      user: {
+        id: newUser.id,
+        role: newUser.role,
+        email: newUser.email,
+      },
+      token: "fake-jwt-token",
+    },
+  ];
 });
 
 export default createStore({
@@ -209,6 +241,25 @@ export default createStore({
       commit("SET_USER", null);
       commit("SET_TOKEN", null);
     },
+    async register({ commit }, user) {
+      const response = await axios.post("/register", {
+        email: user.email,
+        password: user.password,
+        confirmPassword: user.confirmPassword,
+        role: user.role,
+        phoneNumber: user.phoneNumber,
+      });
+
+      if (response.data.message) {
+        throw new Error(response.data.message);
+      }
+
+      commit("SET_USER", response.data.user);
+      commit("SET_TOKEN", response.data.token);
+
+      return response;
+    },
+
     fetchCards({ commit }) {
       axios
         .get("/cards")

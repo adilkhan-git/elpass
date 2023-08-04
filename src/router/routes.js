@@ -10,7 +10,7 @@ const routes = [
   },
   // отдельные роуты для страниц логина и регистрации
   { path: "/login", component: () => import("src/pages/LoginForm.vue") },
-  { path: "/register", component: () => import("pages/RegisterPage.vue") },
+  { path: "/register", component: () => import("src/pages/RegisterForm.vue") },
 
   // Always leave this as last one,
   // but you can also remove it

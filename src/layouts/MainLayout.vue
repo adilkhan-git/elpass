@@ -12,6 +12,14 @@
         />
 
         <q-toolbar-title> elpass-frontend-vue-app </q-toolbar-title>
+        <q-btn
+          flat
+          dense
+          round
+          icon="exit_to_app"
+          aria-label="Logout"
+          @click="logout"
+        />
       </q-toolbar>
     </q-header>
 
@@ -25,7 +33,8 @@
               class="profile-avatar"
             />
             <div class="profile-details">
-              <div class="profile-name">Adilkhan</div>
+              <div class="profile-name">{{ userRole }}</div>
+
               <div class="profile-status">
                 <span class="online-dot"></span>
                 Online
@@ -51,8 +60,10 @@
 </template>
 
 <script>
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, computed } from "vue";
 import EssentialLink from "components/EssentialLink.vue";
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 
 const linksList = [
   {
@@ -83,7 +94,15 @@ export default defineComponent({
   },
 
   setup() {
+    const store = useStore();
     const leftDrawerOpen = ref(false);
+    const router = useRouter();
+
+    const userRole = computed(() => store.state.user?.role ?? "Guest");
+    const logout = () => {
+      store.dispatch("logout");
+      router.push("/login");
+    };
 
     return {
       essentialLinks: linksList,
@@ -91,6 +110,8 @@ export default defineComponent({
       toggleLeftDrawer() {
         leftDrawerOpen.value = !leftDrawerOpen.value;
       },
+      userRole,
+      logout,
     };
   },
 });

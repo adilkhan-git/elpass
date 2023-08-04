@@ -1,6 +1,7 @@
 <template>
   <div class="login">
     <q-form @submit.prevent="login">
+      <h5>Sign In</h5>
       <q-input
         v-model="user.email"
         label="Email"
@@ -15,10 +16,17 @@
       ></q-input>
       <p v-if="error" class="error">{{ error }}</p>
       <q-btn color="primary" label="Войти" type="submit"></q-btn>
+
+      <!-- Добавляем кнопку для перехода на форму регистрации -->
+      <q-btn
+        color="primary"
+        label="Регистрация"
+        type="button"
+        to="/register"
+      ></q-btn>
     </q-form>
   </div>
 </template>
-
 <script>
 import { QInput, QBtn } from "quasar";
 
@@ -60,13 +68,26 @@ export default {
 </script>
 
 <style>
+.q-btn {
+  margin-top: 15px;
+  margin-left: 15px;
+}
+
 .login {
   max-width: 300px;
   margin: auto;
   padding: 20px;
+  margin-top: 250px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
-
 .error {
   color: red;
+}
+
+h5 {
+  text-align: center;
+  
 }
 </style>
