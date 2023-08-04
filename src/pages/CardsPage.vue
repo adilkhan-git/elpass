@@ -22,6 +22,7 @@
       <div class="visitor-cards">
         <VisitorCard
           v-for="visitor in filteredVisitors"
+          
           :key="visitor.id"
           :visitor="visitor"
           @delete="deleteVisitor(visitor.id)"

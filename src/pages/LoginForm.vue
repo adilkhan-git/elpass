@@ -16,8 +16,6 @@
       ></q-input>
       <p v-if="error" class="error">{{ error }}</p>
       <q-btn color="primary" label="Войти" type="submit"></q-btn>
-
-      <!-- Добавляем кнопку для перехода на форму регистрации -->
       <q-btn
         color="primary"
         label="Регистрация"
@@ -88,6 +86,5 @@ export default {
 
 h5 {
   text-align: center;
-  
 }
 </style>
