@@ -8,7 +8,7 @@
         class="add-visit-button"
         color="primary"
         label="Добавить посещение"
-        @click="showModal = true"
+        @click="showDialog = true"
       ></q-btn>
 
       <div class="search-bar">
@@ -22,7 +22,6 @@
       <div class="visitor-cards">
         <VisitorCard
           v-for="visitor in filteredVisitors"
-          
           :key="visitor.id"
           :visitor="visitor"
           @delete="deleteVisitor(visitor.id)"
@@ -31,86 +30,28 @@
       </div>
     </div>
 
-    <q-dialog v-model="showModal" position="standard" @hide="resetForm">
-      <q-card>
-        <q-card-section>
-          <h2>Заполните данные посещения</h2>
-          <q-form @submit.prevent="addVisit">
-            <q-input
-              v-model="newVisit.firstName"
-              label="Имя"
-              required
-            ></q-input>
-            <q-input
-              v-model="newVisit.lastName"
-              label="Фамилия"
-              required
-            ></q-input>
-            <q-input v-model="newVisit.iin" label="ИИН" required></q-input>
-            <q-input
-              v-model="newVisit.phoneNumber"
-              label="Телефон"
-              required
-            ></q-input>
-            <q-input
-              v-model="newVisit.company"
-              label="Компания"
-              required
-            ></q-input>
-            <q-input
-              v-model="newVisit.position"
-              label="Должность"
-              required
-            ></q-input>
-            <q-input v-model="newVisit.type" label="Тип" required></q-input>
-            <q-card-actions align="right">
-              <q-btn
-                color="primary"
-                label="Сохранить"
-                type="submit"
-                @click="saveVisit"
-              ></q-btn>
-              <q-btn
-                color="negative"
-                label="Отмена"
-                @click="closeModal"
-              ></q-btn>
-            </q-card-actions>
-          </q-form>
-        </q-card-section>
-      </q-card>
-    </q-dialog>
+    <VisitorCardDialog
+      :show="showDialog"
+      @save="saveVisit"
+      @update:show="showDialog = $event"
+    />
   </div>
 </template>
 
 <script>
 import { mapState, mapActions, mapMutations } from "vuex";
 import VisitorCard from "../components/VisitorCard.vue";
-
-import {
-  QBtn,
-  QInput,
-  QDialog,
-  QCard,
-  QCardSection,
-  QForm,
-  QCardActions,
-} from "quasar";
+import VisitorCardDialog from "src/components/VisitorCardDialog.vue";
 
 export default {
   name: "CardPage",
   components: {
     VisitorCard,
-    QBtn,
-    QInput,
-    QDialog,
-    QCard,
-    QCardSection,
-    QForm,
-    QCardActions,
+    VisitorCardDialog,
   },
   data() {
     return {
+      showDialog: false,
       searchName: "",
       searchLastName: "",
       searchId: "",
@@ -129,19 +70,15 @@ export default {
     };
   },
   computed: {
-    ...mapState(["cards"]),
+    ...mapState(["cards", "user"]),
     isAdmin() {
-      return this.$store.state.user && this.$store.state.user.role === "admin";
+      return this.user && this.user.role === "admin";
     },
     isOperator() {
-      return (
-        this.$store.state.user && this.$store.state.user.role === "operator"
-      );
+      return this.user && this.user.role === "operator";
     },
     isEmployee() {
-      return (
-        this.$store.state.user && this.$store.state.user.role === "employee"
-      );
+      return this.user && this.user.role === "employee";
     },
 
     filteredVisitors() {
@@ -171,8 +108,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["fetchCards", "addCard", "updateCard"]),
-    ...mapMutations(["deleteCard"]),
+    ...mapActions(["fetchCards", "addCard", "updateCard", "deleteCard"]),
     deleteVisitor(id) {
       this.deleteCard(id);
     },
@@ -194,17 +130,8 @@ export default {
         type: "",
       };
     },
-    saveVisit() {
-      const newCard = {
-        firstName: this.newVisit.firstName,
-        lastName: this.newVisit.lastName,
-        iin: this.newVisit.iin,
-        phoneNumber: this.newVisit.phoneNumber,
-        company: this.newVisit.company,
-        position: this.newVisit.position,
-        type: this.newVisit.type,
-      };
-      this.addCard(newCard)
+    saveVisit(newVisit) {
+      this.addCard(newVisit)
         .then(() => {
           console.log("Карточка добавлена");
           this.closeModal();
@@ -212,6 +139,7 @@ export default {
         .catch((error) => {
           console.error("Ошибка");
         });
+      this.showDialog = false;
     },
     addVisit() {
       this.saveVisit();
