@@ -1,41 +1,36 @@
-<template>
-  <div id="app">
-    <div class="main-content">
-      <h4>Карточки посетителей</h4>
-      <hr class="hr" />
-      <q-btn
-        v-if="isAdmin || isOperator"
-        class="add-visit-button"
-        color="primary"
-        label="Добавить посещение"
-        @click="showDialog = true"
-      ></q-btn>
+<template lang="pug">
+div#app
+  div.main-content
+    h4 Карточки посетителей
+    hr.hr
+    q-btn(
+      v-if="isAdmin || isOperator",
+      class="add-visit-button",
+      color="primary",
+      label="Добавить посещение",
+      @click="showDialog = true"
+    )
+    div.search-bar
+      input(type="text", placeholder="Имя", v-model="searchName")
+      input(type="text", placeholder="Фамилия", v-model="searchLastName")
+      input(type="text", placeholder="ID", v-model="searchId")
+      input(type="text", placeholder="Телефон", v-model="searchPhone")
+      input(type="text", placeholder="ИИН", v-model="searchIin")
 
-      <div class="search-bar">
-        <input type="text" placeholder="Имя" v-model="searchName" />
-        <input type="text" placeholder="Фамилия" v-model="searchLastName" />
-        <input type="text" placeholder="ID" v-model="searchId" />
-        <input type="text" placeholder="Телефон" v-model="searchPhone" />
-        <input type="text" placeholder="ИИН" v-model="searchIin" />
-      </div>
+    div.visitor-cards
+      VisitorCard(
+        v-for="visitor in filteredVisitors",
+        :key="visitor.id",
+        :visitor="visitor",
+        @delete="deleteVisitor(visitor.id)",
+        @update="updateVisitor"
+      )
 
-      <div class="visitor-cards">
-        <VisitorCard
-          v-for="visitor in filteredVisitors"
-          :key="visitor.id"
-          :visitor="visitor"
-          @delete="deleteVisitor(visitor.id)"
-          @update="updateVisitor"
-        />
-      </div>
-    </div>
-
-    <VisitorCardDialog
-      :show="showDialog"
-      @save="saveVisit"
+    VisitorCardDialog(
+      :show="showDialog",
+      @save="saveVisit",
       @update:show="showDialog = $event"
-    />
-  </div>
+    )
 </template>
 
 <script>
@@ -83,20 +78,27 @@ export default {
 
     filteredVisitors() {
       return this.cards.filter((visitor) => {
-        const queryName = this.searchName.toLowerCase();
-        const queryLastName = this.searchLastName.toLowerCase();
-        const queryId = this.searchId.toLowerCase();
-        const queryPhone = this.searchPhone.toLowerCase();
-        const queryIin = this.searchIin.toLowerCase();
-        const nameMatches = visitor.firstName.toLowerCase().includes(queryName);
-        const lastNameMatches = visitor.lastName
-          .toLowerCase()
-          .includes(queryLastName);
-        const idMatches = visitor.id.toString().includes(queryId);
-        const phoneMatches = visitor.phoneNumber
-          .toLowerCase()
-          .includes(queryPhone);
-        const iinMatches = visitor.iin.includes(queryIin);
+        const safeToLower = (val) => (val ? val.toLowerCase() : "");
+        const queryName = safeToLower(this.searchName);
+        const queryLastName = safeToLower(this.searchLastName);
+        const queryId = safeToLower(this.searchId);
+        const queryPhone = safeToLower(this.searchPhone);
+        const queryIin = safeToLower(this.searchIin);
+
+        const nameMatches =
+          visitor.firstName &&
+          safeToLower(visitor.firstName).includes(queryName);
+        const lastNameMatches =
+          visitor.lastName &&
+          safeToLower(visitor.lastName).includes(queryLastName);
+        const idMatches =
+          visitor.id && safeToLower(visitor.id.toString()).includes(queryId);
+        const phoneMatches =
+          visitor.phoneNumber &&
+          safeToLower(visitor.phoneNumber).includes(queryPhone);
+        const iinMatches =
+          visitor.iin && safeToLower(visitor.iin).includes(queryIin);
+
         return (
           nameMatches &&
           lastNameMatches &&

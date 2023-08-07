@@ -1,40 +1,29 @@
-<template>
-  <div class="main-content">
-    <h4>Отчет о посещениях</h4>
-    <hr class="hr" />
-
-    <div class="search-bar">
-      <input type="text" placeholder="ID" v-model="searchId" />
-      <input type="text" placeholder="ФИО" v-model="searchName" />
-      <input type="text" placeholder="Дата с" v-model="searchDateFrom" />
-      <input type="text" placeholder="Дата до" v-model="searchDateTo" />
-      <q-btn color="primary" label="Очистить" @click="clearFilters" />
-    </div>
-
-    <q-table :rows="filteredVisits" :columns="columns" row-key="id">
-      <template v-slot:body-cell[id]="{ props }">
-        {{ props.row.id }}
-      </template>
-      <template v-slot:body-cell[dateTime]="{ props }">
-        {{ props.row.dateTime }}
-      </template>
-      <template v-slot:body-cell[visitorId]="{ props }">
-        {{ props.row.visitorId }}
-      </template>
-      <template v-slot:body-cell[visitorName]="{ props }">
-        {{ props.row.visitorName }}
-      </template>
-      <template v-slot:body-cell[entrance]="{ props }">
-        {{ props.row.entrance }}
-      </template>
-      <template v-slot:body-cell[direction]="{ props }">
-        {{ props.row.direction }}
-      </template>
-      <template v-slot:body-cell[similarity]="{ props }">
-        {{ props.row.similarity }}%
-      </template>
-    </q-table>
-  </div>
+<template lang="pug">
+div.main-content
+  h4 Отчет о посещениях
+  hr.hr
+  div.search-bar
+    input(type="text", placeholder="ID", v-model="searchId")
+    input(type="text", placeholder="ФИО", v-model="searchName")
+    input(type="text", placeholder="Дата с", v-model="searchDateFrom")
+    input(type="text", placeholder="Дата до", v-model="searchDateTo")
+    q-btn(color="primary", label="Очистить", @click="clearFilters")
+      
+  q-table(:rows="filteredVisits", :columns="columns", row-key="id")
+    template(v-slot:body-cell[id]="{ props }")
+      | {{ props.row.id }}
+    template(v-slot:body-cell[dateTime]="{ props }")
+      | {{ props.row.dateTime }}
+    template(v-slot:body-cell[visitorId]="{ props }")
+      | {{ props.row.visitorId }}
+    template(v-slot:body-cell[visitorName]="{ props }")
+      | {{ props.row.visitorName }}
+    template(v-slot:body-cell[entrance]="{ props }")
+      | {{ props.row.entrance }}
+    template(v-slot:body-cell[direction]="{ props }")
+      | {{ props.row.direction }}
+    template(v-slot:body-cell[similarity]="{ props }")
+      | {{ props.row.similarity }}%
 </template>
 
 <script>

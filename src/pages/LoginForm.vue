@@ -1,30 +1,24 @@
-<template>
-  <div class="login">
-    <q-form @submit.prevent="login">
-      <h5>Sign In</h5>
-      <q-input
-        v-model="user.email"
-        label="Email"
-        type="email"
-        required
-      ></q-input>
-      <q-input
-        v-model="user.password"
-        label="Пароль"
-        type="password"
-        required
-      ></q-input>
-      <p v-if="error" class="error">{{ error }}</p>
-      <q-btn color="primary" label="Войти" type="submit"></q-btn>
-      <q-btn
-        color="primary"
-        label="Регистрация"
-        type="button"
-        to="/register"
-      ></q-btn>
-    </q-form>
-  </div>
+<template lang="pug">
+div.login
+  q-form(@submit.prevent="login")
+    h5 Sign In
+    q-input(
+      v-model="user.email"
+      label="Email"
+      type="email"
+      required
+    )
+    q-input(
+      v-model="user.password"
+      label="Пароль"
+      type="password"
+      required
+    )
+    p.error(v-if="error") {{ error }}
+    q-btn(color="primary", label="Войти", type="submit")
+    q-btn(color="primary", label="Регистрация", type="button", to="/register")
 </template>
+
 <script>
 import { QInput, QBtn } from "quasar";
 

@@ -19,6 +19,8 @@
     "@fortawesome/vue-fontawesome": "^3.0.3",
     "@quasar/extras": "^1.16.4",
     "axios": "^1.4.0",
+    "pug": "^3.0.2",
+    "pug-plain-loader": "^1.1.0",
     "quasar": "^2.12.2",
     "vue": "^3.0.0",
     "vue-router": "^4.2.4",

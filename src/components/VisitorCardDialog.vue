@@ -7,21 +7,43 @@
         </div>
       </q-card-section>
       <q-card-section>
-        <q-input filled v-model="localVisitor.firstName" label="First Name" />
-        <q-input filled v-model="localVisitor.lastName" label="Last Name" />
-        <q-input filled v-model="localVisitor.iin" label="ИИН" />
+        <q-input
+          filled
+          v-model="localVisitor.firstName"
+          label="First Name"
+          required
+        />
+        <q-input
+          filled
+          v-model="localVisitor.lastName"
+          label="Last Name"
+          required
+        />
+        <q-input filled v-model="localVisitor.iin" label="ИИН" required />
         <q-input
           filled
           v-model="localVisitor.phoneNumber"
           label="Phone Number"
+          required
         />
-        <q-input filled v-model="localVisitor.company" label="Company" />
-        <q-input filled v-model="localVisitor.position" label="Position" />
+        <q-input
+          filled
+          v-model="localVisitor.company"
+          label="Company"
+          required
+        />
+        <q-input
+          filled
+          v-model="localVisitor.position"
+          label="Position"
+          required
+        />
         <q-select
           filled
           v-model="localVisitor.type"
           label="Type"
           :options="['Многоразовый', 'Временный']"
+          required
         />
       </q-card-section>
       <q-card-actions align="right">
@@ -30,6 +52,7 @@
           flat
           :label="isEditMode ? 'Edit' : 'Save'"
           color="primary"
+          :disabled="!canSave"
           @click="save"
         />
       </q-card-actions>
@@ -84,6 +107,19 @@ export default {
         position: "",
         type: "",
       };
+    },
+  },
+  computed: {
+    canSave() {
+      return (
+        this.localVisitor.firstName &&
+        this.localVisitor.lastName &&
+        this.localVisitor.iin &&
+        this.localVisitor.phoneNumber &&
+        this.localVisitor.company &&
+        this.localVisitor.position &&
+        this.localVisitor.type
+      );
     },
   },
 };

@@ -54,7 +54,6 @@
       />
     </q-card-actions>
 
-    <!-- Dialog -->
     <visitor-card-dialog
       v-model:show="isEditing"
       :visitor="visitor"
