@@ -1,64 +1,33 @@
-<template>
-  <q-dialog v-model="dialogVisible" @keyup.enter="save">
-    <q-card class="dialog">
-      <q-card-section>
-        <div class="text-h6">
-          {{ isEditMode ? "Edit Visitor" : "Add a Visitor" }}
-        </div>
-      </q-card-section>
-      <q-card-section>
-        <q-input
-          filled
-          v-model="localVisitor.firstName"
-          label="First Name"
-          required
-        />
-        <q-input
-          filled
-          v-model="localVisitor.lastName"
-          label="Last Name"
-          required
-        />
-        <q-input filled v-model="localVisitor.iin" label="ИИН" required />
-        <q-input
-          filled
-          v-model="localVisitor.phoneNumber"
-          label="Phone Number"
-          required
-        />
-        <q-input
-          filled
-          v-model="localVisitor.company"
-          label="Company"
-          required
-        />
-        <q-input
-          filled
-          v-model="localVisitor.position"
-          label="Position"
-          required
-        />
-        <q-select
-          filled
-          v-model="localVisitor.type"
-          label="Type"
-          :options="['Многоразовый', 'Временный']"
-          required
-        />
-      </q-card-section>
-      <q-card-actions align="right">
-        <q-btn flat label="Cancel" color="primary" @click="cancel" />
-        <q-btn
-          flat
-          :label="isEditMode ? 'Edit' : 'Save'"
-          color="primary"
-          :disabled="!canSave"
-          @click="save"
-        />
-      </q-card-actions>
-    </q-card>
-  </q-dialog>
+<template lang="pug">
+q-dialog(v-model="dialogVisible" @keyup.enter="save")
+  q-card(class="dialog")
+    q-card-section
+      div.text-h6 {{ isEditMode ? "Edit Visitor" : "Add a Visitor" }}
+    q-card-section
+      q-input(filled v-model="localVisitor.firstName" label="First Name" required)
+      q-input(filled v-model="localVisitor.lastName" label="Last Name" required)
+      q-input(filled v-model="localVisitor.iin" label="ИИН" required)
+      q-input(filled v-model="localVisitor.phoneNumber" label="Phone Number" required)
+      q-input(filled v-model="localVisitor.company" label="Company" required)
+      q-input(filled v-model="localVisitor.position" label="Position" required)
+      q-select(
+        filled
+        v-model="localVisitor.type"
+        label="Type"
+        :options="['Многоразовый', 'Временный']"
+        required
+      )
+    q-card-actions(align="right")
+      q-btn(flat label="Cancel" color="primary" @click="cancel")
+      q-btn(
+        flat
+        :label="isEditMode ? 'Edit' : 'Save'"
+        color="primary"
+        :disabled="!canSave"
+        @click="save"
+       )
 </template>
+
 
 <script>
 export default {

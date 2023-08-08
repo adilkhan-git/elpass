@@ -1,70 +1,33 @@
-<template>
-  <q-card class="card">
-    <q-card-section class="card-header">
-      <div class="visitor-info">
-        <div class="visitor-name">
-          {{ visitor.firstName }} {{ visitor.lastName }}
-        </div>
-        <div class="visitor-iin">ИИН: {{ visitor.iin }}</div>
-        <div class="visitor-phone">
-          <q-icon name="phone" />{{ visitor.phoneNumber }}
-        </div>
-      </div>
-      <div class="company-info">
-        <div class="company-name">
-          {{ visitor.company }}
-        </div>
-        <div class="company-position">
-          {{ visitor.position }}
-        </div>
-      </div>
-    </q-card-section>
-
-    <q-card-section class="card-body">
-      <div class="id-type-last-login">
-        <div class="visitor-id">ID: {{ visitor.id }}</div>
-        <div class="visitor-type">
-          {{ visitor.type }}
-        </div>
-        <div class="last-login">
-          <q-icon name="access_time" class="clock-icon" />
-          {{ formatDateTime(new Date().toISOString()) }}
-        </div>
-      </div>
-    </q-card-section>
-
-    <q-card-actions align="right">
-      <q-btn
-        v-if="isAdmin"
-        flat
-        dense
-        round
-        icon="edit"
-        color="orange"
-        @click="toggleEditing"
-      />
-      <q-btn
-        v-if="isAdmin"
-        flat
-        dense
-        round
-        icon="delete"
-        color="negative"
-        @click="deleteVisitor(visitor.id)"
-      />
-    </q-card-actions>
-
-    <visitor-card-dialog
-      v-model:show="isEditing"
-      :visitor="visitor"
-      @save="saveVisitor"
-    />
-  </q-card>
+<template lang="pug">
+q-card.card
+    q-card-section.card-header
+      .visitor-info
+        .visitor-name {{ visitor.firstName }} {{ visitor.lastName }}
+        .visitor-iin ИИН: {{ visitor.iin }}
+        .visitor-phone
+          q-icon(name="phone")
+          | {{ visitor.phoneNumber }}
+      .company-info
+        .company-name {{ visitor.company }}
+        .company-position {{ visitor.position }}
+    q-card-section.card-body
+      .id-type-last-login
+        .visitor-id ID: {{ visitor.id }}
+        .visitor-type {{ visitor.type }}
+        .last-login
+          q-icon(name="access_time" class="clock-icon")
+          | {{ formatDateTime(visitor.lastLogin || new Date()) }};
+    q-card-actions.align-right
+      q-btn(v-if="isAdmin" flat dense round icon="edit" color="orange" @click="toggleEditing")
+      q-btn(v-if="isAdmin" flat dense round icon="delete" color="negative" @click="deleteVisitor(visitor.id)")
+    visitor-card-dialog(:show="isEditing" :visitor="visitor" @save="saveVisitor")
 </template>
+  
 
 <script>
 import { QCard, QCardSection, QCardActions, QBtn, QIcon } from "quasar";
 import VisitorCardDialog from "./VisitorCardDialog.vue";
+import { mapState } from "vuex";
 
 export default {
   components: {
@@ -81,18 +44,15 @@ export default {
     };
   },
   computed: {
+    ...mapState(["user"]),
     isAdmin() {
-      return this.$store.state.user && this.$store.state.user.role === "admin";
+      return this.user && this.user.role === "admin";
     },
     isOperator() {
-      return (
-        this.$store.state.user && this.$store.state.user.role === "operator"
-      );
+      return this.user && this.user.role === "operator";
     },
     isEmployee() {
-      return (
-        this.$store.state.user && this.$store.state.user.role === "employee"
-      );
+      return this.user && this.user.role === "employee";
     },
   },
   name: "VisitorCard",
@@ -122,7 +82,7 @@ export default {
         month: "long",
         year: "numeric",
       };
-      return new Date().toLocaleString("en-US", options);
+      return new Date(dateTime).toLocaleString("ru-RU", options);
     },
   },
 };

@@ -1,6 +1,6 @@
 <template lang="pug">
 div.login
-  q-form(@submit.prevent="login")
+  q-form(@submit.prevent="loginUser")
     h5 Sign In
     q-input(
       v-model="user.email"
@@ -20,6 +20,7 @@ div.login
 </template>
 
 <script>
+import { mapActions } from "vuex";
 import { QInput, QBtn } from "quasar";
 
 export default {
@@ -38,14 +39,11 @@ export default {
     };
   },
   methods: {
-    async login() {
+    ...mapActions(["login"]),
+    async loginUser() {
       try {
-        const response = await this.$store.dispatch("login", this.user);
-        if (response.status === 200) {
-          this.$router.push("/");
-        } else {
-          this.error = "Неверный адрес электронной почты или пароль.";
-        }
+        await this.login(this.user);
+        this.$router.push("/");
       } catch (error) {
         if (error.response && error.response.status === 400) {
           this.error = "Неверный адрес электронной почты или пароль.";

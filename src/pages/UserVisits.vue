@@ -24,11 +24,29 @@ div.main-content
       | {{ props.row.direction }}
     template(v-slot:body-cell[similarity]="{ props }")
       | {{ props.row.similarity }}%
+
+  
+
 </template>
 
 <script>
 import { mapActions, mapState } from "vuex";
-import axios from "axios";
+
+function parseCustomDate(dateTimeStr) {
+  if (!dateTimeStr) {
+    return null;
+  }
+
+  const [date, time] = dateTimeStr.split(" ");
+  if (!date || !time) {
+    return null;
+  }
+
+  const [year, month, day] = date.split("-").map(Number);
+  const [hour, minute] = time.split(":").map(Number);
+
+  return new Date(year, month - 1, day, hour, minute);
+}
 
 export default {
   name: "UserVisits",
@@ -41,9 +59,7 @@ export default {
     };
   },
   computed: {
-    ...mapState({
-      visits: (state) => state.visits,
-    }),
+    ...mapState(["visits"]),
     columns() {
       return [
         {
@@ -104,39 +120,36 @@ export default {
         },
       ];
     },
+    queryId() {
+      return this.searchId.toLowerCase();
+    },
+    queryName() {
+      return this.searchName.toLowerCase();
+    },
+    queryDateFrom() {
+      return this.searchDateFrom ? parseCustomDate(this.searchDateFrom) : null;
+    },
+    queryDateTo() {
+      return this.searchDateTo ? parseCustomDate(this.searchDateTo) : null;
+    },
     filteredVisits() {
-      const filtered = this.visits.filter((visit) => {
-        const queryId = this.searchId.toLowerCase();
-        const queryName = this.searchName.toLowerCase();
-        const queryDateFrom = this.searchDateFrom.toLowerCase();
-        const queryDateTo = this.searchDateTo.toLowerCase();
-
+      return this.visits.filter((visit) => {
+        const visitDate = parseCustomDate(visit.dateTime);
         return (
-          visit.id.toString().includes(queryId) &&
-          visit.visitorName.toLowerCase().includes(queryName) &&
-          visit.dateTime.includes(queryDateFrom) &&
-          visit.dateTime.includes(queryDateTo)
+          visit.id.toString().includes(this.queryId) &&
+          visit.visitorName.toLowerCase().includes(this.queryName) &&
+          (!this.searchDateFrom || visitDate >= this.queryDateFrom) &&
+          (!this.searchDateTo || visitDate <= this.queryDateTo)
         );
       });
-
-      return filtered;
     },
   },
   created() {
     this.fetchVisits();
+    console.log(this.visits);
   },
   methods: {
     ...mapActions(["fetchVisits"]),
-    loadVisits() {
-      axios
-        .get("/visits")
-        .then((response) => {
-          this.visits = response.data;
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    },
     clearFilters() {
       this.searchId = "";
       this.searchName = "";
