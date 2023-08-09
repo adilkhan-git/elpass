@@ -50,6 +50,14 @@
           :key="link.title"
           v-bind="link"
         />
+        <q-item-label header> Администрирование </q-item-label>
+        <q-expansion-item label="Настройки" icon="settings">
+          <EssentialLink
+            v-for="subLink in settingsLinks"
+            :key="subLink.title"
+            v-bind="subLink"
+          />
+        </q-expansion-item>
       </q-list>
     </q-drawer>
 
@@ -79,10 +87,25 @@ const linksList = [
     link: "http://localhost:9000/#/cards",
   },
   {
-    title: "Настройки",
+    title: "Списки",
     caption: "",
-    icon: "settings",
+    icon: "format_list_bulleted",
     link: "#",
+  },
+];
+
+const settingsLinks = [
+  {
+    title: "Пользователи",
+    link: "http://localhost:9000/#/userlist",
+  },
+  {
+    title: "Терминалы",
+    link: "http://localhost:9000/#/terminals",
+  },
+  {
+    title: "Компании",
+    link: "http://localhost:9000/#/companies",
   },
 ];
 
@@ -106,6 +129,7 @@ export default defineComponent({
 
     return {
       essentialLinks: linksList,
+      settingsLinks: settingsLinks,
       leftDrawerOpen,
       toggleLeftDrawer() {
         leftDrawerOpen.value = !leftDrawerOpen.value;
@@ -128,6 +152,10 @@ export default defineComponent({
   width: 40px;
   height: 40px;
   border-radius: 50%;
+}
+
+.custom-link-style {
+  padding-left: 150px;
 }
 
 .profile-details {

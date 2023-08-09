@@ -6,6 +6,9 @@ const routes = [
       { path: "", component: () => import("pages/IndexPage.vue") },
       { path: "cards", component: () => import("pages/CardsPage.vue") },
       { path: "visits", component: () => import("pages/UserVisits.vue") },
+      { path: "userlist", component: () => import("pages/UserList.vue") },
+      { path: "terminals", component: () => import("pages/TerminalsPage.vue") },
+      { path: "companies", component: () => import("pages/CompaniesPage.vue") },
     ],
   },
   // отдельные роуты для страниц логина и регистрации
