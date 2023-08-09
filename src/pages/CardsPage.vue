@@ -1,36 +1,36 @@
 <template lang="pug">
 div#app
-  div.main-content
-    h4 Карточки посетителей
-    hr.hr
-    q-btn(
-      v-if="isAdmin || isOperator",
-      class="add-visit-button",
-      color="primary",
-      label="Добавить посещение",
-      @click="showDialog = true"
-    )
-    div.search-bar
-      input(type="text", placeholder="Имя", v-model="searchName")
-      input(type="text", placeholder="Фамилия", v-model="searchLastName")
-      input(type="text", placeholder="ID", v-model="searchId")
-      input(type="text", placeholder="Телефон", v-model="searchPhone")
-      input(type="text", placeholder="ИИН", v-model="searchIin")
-
-    div.visitor-cards
-      VisitorCard(
-        v-for="visitor in filteredVisitors",
-        :key="visitor.id",
-        :visitor="visitor",
-        @delete="deleteVisitor(visitor.id)",
-        @update="updateVisitor"
+    div.main-content
+      h4 Карточки посетителей
+      hr.hr
+      q-btn(
+        
+        class="add-visit-button",
+        color="primary",
+        label="Добавить посещение",
+        @click="showDialog = true"
       )
-
-    VisitorCardDialog(
-      :show="showDialog",
-      @save="saveVisit",
-      @update:show="showDialog = $event"
-    )
+      div.search-bar
+        input(type="text", placeholder="Имя", v-model="searchName")
+        input(type="text", placeholder="Фамилия", v-model="searchLastName")
+        input(type="text", placeholder="ID", v-model="searchId")
+        input(type="text", placeholder="Телефон", v-model="searchPhone")
+        input(type="text", placeholder="ИИН", v-model="searchIin")
+  
+      div.visitor-cards
+        VisitorCard(
+          v-for="visitor in filteredVisitors",
+          :key="visitor.id",
+          :visitor="visitor",
+          @delete="deleteVisitor(visitor.id)",
+          @update="updateVisitor"
+        )
+  
+      VisitorCardDialog(
+        :show="showDialog",
+        @save="saveVisit",
+        @update:show="showDialog = $event"
+      )
 </template>
 
 <script>

@@ -103,6 +103,13 @@ const users = [
   },
 ];
 
+mock.onPost("/upload-photo").reply((config) => {
+  const formData = config.data;
+  const uploadedFile = formData.get("file");
+  const uploadedImageURL = URL.createObjectURL(uploadedFile);
+  return [200, { photoUrl: uploadedImageURL }];
+});
+
 mock.onGet("/cards").reply(200, cards);
 mock.onGet("/visits").reply(200, visits);
 mock.onPost("/cards").reply((config) => {

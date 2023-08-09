@@ -1,6 +1,7 @@
 <template lang="pug">
 q-card.card
     q-card-section.card-header
+      img.visitor-photo(v-if="visitor.photoUrl" :src="visitor.photoUrl" alt="Visitor Photo")
       .visitor-info
         .visitor-name {{ visitor.firstName }} {{ visitor.lastName }}
         .visitor-iin ИИН: {{ visitor.iin }}
@@ -18,11 +19,10 @@ q-card.card
           q-icon(name="access_time" class="clock-icon")
           | {{ formatDateTime(visitor.lastLogin || new Date()) }};
     q-card-actions.align-right
-      q-btn(v-if="isAdmin" flat dense round icon="edit" color="orange" @click="toggleEditing")
+      q-btn( flat dense round icon="edit" color="orange" @click="toggleEditing")
       q-btn(v-if="isAdmin" flat dense round icon="delete" color="negative" @click="deleteVisitor(visitor.id)")
     visitor-card-dialog(:show="isEditing" :visitor="visitor" @save="saveVisitor")
 </template>
-  
 
 <script>
 import { QCard, QCardSection, QCardActions, QBtn, QIcon } from "quasar";
@@ -89,6 +89,13 @@ export default {
 </script>
 
 <style>
+.visitor-photo {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
 .card {
   margin: 10px;
   width: 100%;
