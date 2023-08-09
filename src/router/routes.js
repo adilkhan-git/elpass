@@ -9,6 +9,11 @@ const routes = [
       { path: "userlist", component: () => import("pages/UserList.vue") },
       { path: "terminals", component: () => import("pages/TerminalsPage.vue") },
       { path: "companies", component: () => import("pages/CompaniesPage.vue") },
+      {
+        path: "cards/edit/:id",
+        component: () => import("pages/EditPage.vue"),
+        props: true, 
+      },
     ],
   },
   // отдельные роуты для страниц логина и регистрации
