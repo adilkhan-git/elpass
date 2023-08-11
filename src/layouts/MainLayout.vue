@@ -33,7 +33,7 @@
               class="profile-avatar"
             />
             <div class="profile-details">
-              <div class="profile-name">{{ userRole }}</div>
+              <div class="profile-name">{{ userName }}</div>
 
               <div class="profile-status">
                 <span class="online-dot"></span>
@@ -121,7 +121,8 @@ export default defineComponent({
     const leftDrawerOpen = ref(false);
     const router = useRouter();
 
-    const userRole = computed(() => store.state.user?.role ?? "Guest");
+    const userName = computed(() => store.state.user?.firstName ?? "Guest");
+
     const logout = () => {
       store.dispatch("logout");
       router.push("/login");
@@ -134,7 +135,7 @@ export default defineComponent({
       toggleLeftDrawer() {
         leftDrawerOpen.value = !leftDrawerOpen.value;
       },
-      userRole,
+      userName,
       logout,
     };
   },

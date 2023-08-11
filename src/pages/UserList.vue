@@ -1,5 +1,6 @@
 <template>
   <q-page padding>
+    <h4>Список пользователей</h4>
     <q-btn color="primary" label="Add User" @click="openDialogForNewUser" />
 
     <q-table :rows="users" :columns="columns" row-key="id">

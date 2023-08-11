@@ -1,41 +1,48 @@
 <template lang="pug">
 q-dialog(v-model="dialogVisible" @keyup.enter="save")
-    q-card(class="dialog")
-      q-card-section
-        div.text-h6 {{ isEditMode ? "Edit Visitor" : "Add a Visitor" }}
-      q-card-section
-        q-input(filled v-model="localVisitor.firstName" label="First Name" required)
-        q-input(filled v-model="localVisitor.lastName" label="Last Name" required)
-        q-input(filled v-model="localVisitor.iin" label="ИИН" required)
-        q-input(filled v-model="localVisitor.phoneNumber" label="Phone Number" required)
-        q-input(filled v-model="localVisitor.company" label="Company" required)
-        q-input(filled v-model="localVisitor.position" label="Position" required)
-        q-select(
-          filled
-          v-model="localVisitor.type"
-          label="Type"
-          :options="['Многоразовый', 'Временный']"
-          required
-        )
-        input(type="file" @change="onFileChange")
-        
-
-
-
-      q-card-actions(align="right")
-        q-btn(flat label="Cancel" color="primary" @click="cancel")
-        q-btn(
-          flat
-          :label="isEditMode ? 'Edit' : 'Save'"
-          color="primary"
-          :disabled="!canSave"
-          @click="save"
-         )
+      q-card(class="dialog")
+        q-card-section
+          div.text-h6 {{ isEditMode ? "Edit Visitor" : "Add a Visitor" }}
+        q-card-section
+          q-input(filled v-model="localVisitor.firstName" label="First Name" required)
+          q-input(filled v-model="localVisitor.lastName" label="Last Name" required)
+          q-input(filled v-model="localVisitor.iin" label="ИИН" required)
+          q-input(filled v-model="localVisitor.phoneNumber" label="Phone Number" required)
+          q-input(filled v-model="localVisitor.company" label="Company" required)
+          q-input(filled v-model="localVisitor.position" label="Position" required)
+          q-select(
+            filled
+            v-model="localVisitor.type"
+            label="Type"
+            :options="['Многоразовый', 'Временный']"
+            required
+          )
+          input(type="file" @change="onFileChange")
+          Cropper(
+            ref="cropperRef"
+            :src="croppieImage"
+            :stencil-props="{ aspectRatio: 1,}"
+          )
+        q-card-actions(align="right")
+          q-btn(flat label="Cancel" color="primary" @click="cancel")
+          q-btn(
+            flat
+            :label="isEditMode ? 'Edit' : 'Save'"
+            color="primary"
+            :disabled="!canSave"
+            @click="save"
+           )
 </template>
 
 <script>
+import { Cropper } from "vue-advanced-cropper";
+import "vue-advanced-cropper/dist/style.css";
 import axios from "axios";
+
 export default {
+  components: {
+    Cropper,
+  },
   props: {
     show: Boolean,
     visitor: Object,
@@ -46,6 +53,8 @@ export default {
       localVisitor: null,
       isEditMode: false,
       selectedFile: null,
+      croppieImage: null,
+      croppieInitialized: false,
     };
   },
   watch: {
@@ -67,18 +76,16 @@ export default {
       this.resetForm();
     },
     save() {
-      this.dialogVisible = false;
+      const image = this.$refs.cropperRef.resultImage;
+      const blob = new Blob([image], { type: "image/jpeg" });
 
       const formData = new FormData();
-      formData.append("file", this.selectedFile);
+      formData.append("file", blob, "cropped-image.jpeg");
 
       axios
         .post("/upload-photo", formData)
         .then((response) => {
-          console.log(response.data.photoUrl); // Этот лог внутри обработчика и имеет доступ к response
           this.localVisitor.photoUrl = response.data.photoUrl;
-
-          // Переместите следующие вызовы внутрь обработчика, чтобы они выполнились после успешной загрузки фотографии:
           this.$emit("update:show", false);
           this.$emit("save", this.localVisitor);
           this.resetForm();
@@ -87,7 +94,6 @@ export default {
           console.error("Ошибка при загрузке фотографии:", error);
         });
     },
-
     resetForm() {
       this.localVisitor = {
         firstName: "",
@@ -102,10 +108,17 @@ export default {
     },
     onFileChange(event) {
       if (event.target.files && event.target.files[0]) {
-        this.selectedFile = event.target.files[0];
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          this.croppieImage = e.target.result;
+        };
+        reader.readAsDataURL(event.target.files[0]);
       } else {
         console.warn("No file selected or browser doesn’t support File API");
       }
+    },
+    onCroppieInit() {
+      this.croppieInitialized = true;
     },
   },
   computed: {
