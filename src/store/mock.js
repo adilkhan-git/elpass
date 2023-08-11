@@ -88,25 +88,84 @@ const users = [
     email: "admin@gmail.com",
     password: "admin",
     role: "admin",
+    firstName: "John",
+    lastName: "Doe",
+    position: "CEO",
+    phoneNumber: "+1234567890",
   },
   {
     id: 2,
     email: "operator@gmail.com",
     password: "operator",
     role: "operator",
+    firstName: "Jane",
+    lastName: "Smith",
+    position: "Operator",
+    phoneNumber: "+0987654321",
   },
   {
     id: 3,
     email: "employee@gmail.com",
     password: "employee",
     role: "employee",
+    firstName: "Sam",
+    lastName: "Adams",
+    position: "Employee",
+    phoneNumber: "+1122334455",
   },
 ];
+
+mock.onGet("/users").reply(() => {
+  console.log("Fetching all users");
+  return [200, users];
+});
+
+mock.onPost("/users").reply((config) => {
+  const newUser = JSON.parse(config.data);
+
+  // Присваиваем новому пользователю уникальный ID
+  const newId = Math.max(...users.map((u) => u.id)) + 1;
+  newUser.id = newId;
+
+  users.push(newUser);
+  console.log("Added new user:", newUser);
+
+  return [201, newUser];
+});
+
+mock.onPut(/\/users\/\d+/).reply((config) => {
+  const updatedUser = JSON.parse(config.data);
+  const index = users.findIndex((user) => user.id === updatedUser.id);
+
+  if (index !== -1) {
+    users[index] = updatedUser;
+    console.log("Updated user:", updatedUser);
+    return [200, updatedUser];
+  } else {
+    console.error("User not found for updating:", updatedUser.id);
+    return [404, { message: "User not found" }];
+  }
+});
+
+mock.onDelete(/\/users\/\d+/).reply((config) => {
+  const userId = parseInt(config.url.split("/").pop());
+  const index = users.findIndex((u) => u.id === userId);
+
+  if (index !== -1) {
+    users.splice(index, 1);
+    console.log("Deleted user with ID:", userId);
+    return [200];
+  } else {
+    console.error("User not found for deletion:", userId);
+    return [404, { message: "User not found" }];
+  }
+});
 
 mock.onPost("/upload-photo").reply((config) => {
   const formData = config.data;
   const uploadedFile = formData.get("file");
   const uploadedImageURL = URL.createObjectURL(uploadedFile);
+
   return [200, { photoUrl: uploadedImageURL }];
 });
 

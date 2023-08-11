@@ -9,6 +9,7 @@ export default createStore({
     cards: [],
     visits: [],
     dialogVisible: false,
+    users: [],
   },
   actions: {
     async login({ state }, user) {
@@ -28,6 +29,38 @@ export default createStore({
     logout({ state }) {
       state.user = null;
       state.token = null;
+    },
+
+    async fetchUsers({ state }) {
+      try {
+        const response = await axios.get("/users");
+        state.users = response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    updateUser({ state }, user) {
+      console.log("Updating user in Vuex action", user);
+      return axios.put(`/users/${user.id}`, user).then((response) => {
+        const index = state.users.findIndex((u) => u.id === user.id);
+        if (index !== -1) state.users[index] = response.data; // Здесь мы обновляем данные в state.
+        console.log("Updated user in state:", state.users[index]); // Лог после обновления
+      });
+    },
+
+    addUser({ state }, user) {
+      return axios.post("/users", user).then((response) => {
+        state.users.push(response.data);
+        return response;
+      });
+    },
+
+    deleteUser({ state }, userId) {
+      return axios.delete(`/users/${userId}`).then((response) => {
+        const index = state.users.findIndex((user) => user.id === userId);
+        if (index !== -1) state.users.splice(index, 1);
+        return response;
+      });
     },
 
     async fetchCards({ state }) {
@@ -88,5 +121,6 @@ export default createStore({
   },
   getters: {
     getVisits: (state) => state.visits,
+    getUsers: (state) => state.users,
   },
 });
