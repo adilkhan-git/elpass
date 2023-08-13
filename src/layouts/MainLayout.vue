@@ -59,6 +59,9 @@
           />
         </q-expansion-item>
       </q-list>
+      <div class="icon-container">
+        <img class="icon" src="../../public/images/elpass.svg" alt="" />
+      </div>
     </q-drawer>
 
     <q-page-container>
@@ -143,6 +146,18 @@ export default defineComponent({
 </script>
 
 <style>
+.icon-container {
+  position: absolute;
+  bottom: 10px;   /* Отступ снизу */
+  left: 50%;
+  transform: translateX(-50%); /* Это центрирует иконку по горизонтали */
+}
+
+.icon {
+  width: 100px;
+  height: 100px;
+}
+
 .profile-container {
   display: flex;
   align-items: center;
@@ -183,5 +198,8 @@ export default defineComponent({
 
 .q-drawer {
   background-color: rgb(230, 230, 230);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 </style>
