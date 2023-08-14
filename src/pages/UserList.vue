@@ -110,11 +110,11 @@ export default {
     ...mapActions(["fetchUsers", "updateUser", "deleteUser", "addUser"]),
 
     openDialogForNewUser() {
-      this.editedUser = {}; // создаем пустого пользователя
+      this.editedUser = {}; 
       this.editDialog = true;
     },
     editUser(user) {
-      this.editedUser = Object.assign({}, user); // редактирование существующего пользователя
+      this.editedUser = Object.assign({}, user); 
       this.editDialog = true;
     },
     onUserSave(savedUser) {

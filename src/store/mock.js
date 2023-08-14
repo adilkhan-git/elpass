@@ -115,6 +115,91 @@ const users = [
   },
 ];
 
+const lists = [
+  {
+    id: 1,
+    name: "Список 1",
+    date: "2023-08-10",
+  },
+  {
+    id: 2,
+    name: "Список 2",
+    date: "2023-08-05",
+  },
+  {
+    id: 3,
+    name: "Список 3",
+    date: "2023-08-05",
+  },
+  {
+    id: 4,
+    name: "Список 4",
+    date: "2023-08-05",
+  },
+];
+
+const terminals = [
+  {
+    id: 1,
+    name: "Терминал 1",
+    url: "http://192.168.0.178",
+    type: "In",
+    status: "Online",
+  },
+  {
+    id: 2,
+    name: "Терминал 2",
+    url: "http://192.168.0.188",
+    type: "Out",
+    status: "Online",
+  },
+];
+
+mock.onGet("/terminals").reply(() => {
+  console.log("fetched all terminals");
+  return [200, terminals];
+});
+
+mock.onPost("/terminals").reply((config) => {
+  const newTerminal = JSON.parse(config.data);
+  const maxId = Math.max(...terminals.map((terminal) => terminal.id));
+  newTerminal.id = maxId + 1;
+
+  terminals.push(newTerminal);
+
+  console.log("Added new terminal with ID:", newTerminal.id);
+  return [200, newTerminal];
+});
+
+mock.onDelete(/\/terminals\/\d+/).reply((config) => {
+  const id = parseInt(config.url.split("/").pop());
+  const index = terminals.findIndex((terminal) => terminal.id === id);
+  if (index !== -1) {
+    terminals.splice(index, 1);
+    console.log("Deleted terminal with ID:", id);
+    return [200];
+  } else {
+    return [404, { message: "Terminal not found" }];
+  }
+});
+
+mock.onGet("/lists").reply(() => {
+  console.log("fetched all lists");
+  return [200, lists];
+});
+
+mock.onDelete(/\/lists\/\d+/).reply((config) => {
+  const id = parseInt(config.url.split("/").pop());
+  const index = lists.findIndex((list) => list.id === id);
+  if (index !== -1) {
+    lists.splice(index, 1);
+    console.log("Deleted list with ID:", id);
+    return [200];
+  } else {
+    return [404, { message: "List not found" }];
+  }
+});
+
 mock.onGet("/users").reply(() => {
   console.log("Fetching all users");
   return [200, users];
@@ -122,8 +207,6 @@ mock.onGet("/users").reply(() => {
 
 mock.onPost("/users").reply((config) => {
   const newUser = JSON.parse(config.data);
-
-  // Присваиваем новому пользователю уникальный ID
   const newId = Math.max(...users.map((u) => u.id)) + 1;
   newUser.id = newId;
 

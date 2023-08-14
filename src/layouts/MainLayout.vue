@@ -60,7 +60,7 @@
         </q-expansion-item>
       </q-list>
       <div class="icon-container">
-        <img class="icon" src="../../public/images/elpass.svg" alt="" />
+        <img class="icon" src="/images/elpass.svg" alt="" />
       </div>
     </q-drawer>
 
@@ -93,7 +93,7 @@ const linksList = [
     title: "Списки",
     caption: "",
     icon: "format_list_bulleted",
-    link: "#",
+    link: "http://localhost:9000/#/list",
   },
 ];
 
@@ -148,7 +148,7 @@ export default defineComponent({
 <style>
 .icon-container {
   position: absolute;
-  bottom: 10px;   /* Отступ снизу */
+  bottom: 10px; /* Отступ снизу */
   left: 50%;
   transform: translateX(-50%); /* Это центрирует иконку по горизонтали */
 }
