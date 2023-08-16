@@ -12,12 +12,8 @@ export default createStore({
     users: [],
     lists: [],
     terminals: [],
-    currentLanguage: "ru",
   },
   actions: {
-    changeLanguage(context, language) {
-      context.state.currentLanguage = language;
-    },
     async login({ state }, user) {
       try {
         const response = await axios.post("/login", {
@@ -137,14 +133,6 @@ export default createStore({
       });
     },
 
-    async fetchCards({ state }) {
-      try {
-        const response = await axios.get("/cards");
-        state.cards = response.data;
-      } catch (error) {
-        console.error(error);
-      }
-    },
     async fetchVisits({ state }) {
       try {
         const response = await axios.get("/visits");
@@ -153,8 +141,42 @@ export default createStore({
         console.error(error);
       }
     },
-    async addCard({ state }, card) {
+
+    async fetchCards({ state }) {
       try {
+        const response = await axios.get("/cards");
+        state.cards = response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async deleteCard({ state }, id) {
+      try {
+        await axios.delete(`/cards/${id}`);
+        state.cards = state.cards.filter((card) => card.id !== id);
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async uploadPhoto({ state }, photo) {
+      try {
+        const formData = new FormData();
+        formData.append("file", photo);
+        const response = await axios.post("/upload-photo", formData);
+        console.log("Uploaded photo URL:", response.data.photoUrl);
+        return response.data.photoUrl;
+      } catch (error) {
+        console.error("Ошибка при загрузке фотографии:", error);
+        throw error;
+      }
+    },
+
+    async addCard({ dispatch, state }, card) {
+      try {
+        if (card.photo) {
+          const photoUrl = await dispatch("uploadPhoto", card.photo);
+          card.photoUrl = photoUrl;
+        }
         const response = await axios.post("/cards", card);
         const newCard = response.data;
         state.cards.push(newCard);
@@ -165,16 +187,12 @@ export default createStore({
       }
     },
 
-    async deleteCard({ state }, id) {
+    async updateCard({ dispatch, state }, updatedCard) {
       try {
-        await axios.delete(`/cards/${id}`);
-        state.cards = state.cards.filter((card) => card.id !== id);
-      } catch (error) {
-        console.error(error);
-      }
-    },
-    async updateCard({ state }, updatedCard) {
-      try {
+        if (updatedCard.photo) {
+          const photoUrl = await dispatch("uploadPhoto", updatedCard.photo);
+          updatedCard.photoUrl = photoUrl;
+        }
         await axios.put(`/cards/${updatedCard.id}`, updatedCard);
         const index = state.cards.findIndex(
           (card) => card.id === updatedCard.id
@@ -189,9 +207,10 @@ export default createStore({
         throw error;
       }
     },
-    setDialogVisible({ state }, value) {
-      state.dialogVisible = value;
-    },
+
+    // setDialogVisible({ state }, value) {
+    //   state.dialogVisible = value;
+    // },
   },
   getters: {
     getVisits: (state) => state.visits,

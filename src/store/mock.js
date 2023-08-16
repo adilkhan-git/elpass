@@ -14,6 +14,7 @@ const cards = [
     position: "Менеджер",
     type: "Многоразовый",
     lastLogin: "2023-05-31",
+    photoUrl: "https://picsum.photos/151",
   },
   {
     id: 2,
@@ -25,6 +26,7 @@ const cards = [
     position: "Разработчик",
     type: "Многоразовый",
     lastLogin: "2023-06-02",
+    photoUrl: "https://picsum.photos/152",
   },
   {
     id: 3,
@@ -36,17 +38,19 @@ const cards = [
     position: "Бухгалтер",
     type: "Временный",
     lastLogin: "2023-06-04",
+    photoUrl: "https://picsum.photos/153",
   },
   {
     id: 4,
-    firstName: "dsa",
-    lastName: "Сидорова",
-    iin: "456789012345",
+    firstName: "Инна",
+    lastName: "Федорова",
+    iin: "1234567890",
     phoneNumber: "+74567890123",
-    company: "ИП Семакина",
-    position: "Бухгалтер",
+    company: "ИП Алишер",
+    position: "Финансист",
     type: "Временный",
-    lastLogin: "2023-06-04",
+    lastLogin: "2023-06-05",
+    photoUrl: "https://picsum.photos/154",
   },
 ];
 
@@ -260,21 +264,34 @@ mock.onDelete(/\/users\/\d+/).reply((config) => {
 mock.onPost("/upload-photo").reply((config) => {
   const formData = config.data;
   const uploadedFile = formData.get("file");
+
   const uploadedImageURL = URL.createObjectURL(uploadedFile);
 
   return [200, { photoUrl: uploadedImageURL }];
 });
 
 mock.onGet("/cards").reply(200, cards);
-mock.onGet("/visits").reply(200, visits);
+
 mock.onPost("/cards").reply((config) => {
   const newCard = JSON.parse(config.data);
   const cardId = cards.length + 1;
   newCard.id = cardId;
+  newCard.photoUrl = "";
   console.log(cards);
   cards.push(newCard);
   console.log("pushed");
   return [201, newCard];
+});
+mock.onPut(/\/cards\/\d+/).reply((config) => {
+  const updatedCard = JSON.parse(config.data);
+  const cardIndex = cards.findIndex((card) => card.id === updatedCard.id);
+  if (cardIndex !== -1) {
+    cards[cardIndex] = updatedCard;
+    console.log("Card is updated");
+    return [200, updatedCard];
+  } else {
+    return [404, { message: "Card not found" }];
+  }
 });
 mock.onDelete(/\/cards\/(\d+)/).reply((config) => {
   const id = parseInt(config.url.match(/\/cards\/(\d+)/)[1]);
@@ -287,17 +304,6 @@ mock.onDelete(/\/cards\/(\d+)/).reply((config) => {
   }
 });
 
-mock.onPut(/\/cards\/\d+/).reply((config) => {
-  const updatedCard = JSON.parse(config.data);
-  const cardIndex = cards.findIndex((card) => card.id === updatedCard.id);
-  if (cardIndex !== -1) {
-    cards[cardIndex] = updatedCard;
-    console.log("Card is updated");
-    return [200, updatedCard];
-  } else {
-    return [404, { message: "Card not found" }];
-  }
-});
 mock.onPost("/login").reply((config) => {
   const { email, password } = JSON.parse(config.data);
   const user = users.find(
@@ -321,5 +327,6 @@ mock.onPost("/login").reply((config) => {
     return [400, { message: "Email or password is incorrect" }];
   }
 });
+mock.onGet("/visits").reply(200, visits);
 
 export default mock;

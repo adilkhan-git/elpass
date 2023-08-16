@@ -1,7 +1,10 @@
 <template lang="pug">
 q-card.card
       q-card-section.card-header
-        img.visitor-photo(v-if="visitor.photoUrl" :src="visitor.photoUrl" alt="Visitor Photo")
+        
+        img.visitor-photo(:src="photoUrl" alt="Cropped image" )
+
+
         .visitor-info
           .visitor-name {{ visitor.firstName }} {{ visitor.lastName }}
           .visitor-iin {{ $t('visitorCard.iin', { iin: visitor.iin }) }}
@@ -23,20 +26,13 @@ q-card.card
         q-btn(v-if="isAdmin" flat dense round icon="delete" color="negative" @click="deleteVisitor(visitor.id)")
       visitor-card-dialog(:show="isEditing" :visitor="visitor" @save="saveVisitor")
 </template>
-  
-  
+
 <script>
-import { QCard, QCardSection, QCardActions, QBtn, QIcon } from "quasar";
 import VisitorCardDialog from "./VisitorCardDialog.vue";
 import { mapState } from "vuex";
 
 export default {
   components: {
-    QCard,
-    QCardSection,
-    QCardActions,
-    QBtn,
-    QIcon,
     VisitorCardDialog,
   },
   data() {
@@ -62,7 +58,9 @@ export default {
       type: Object,
       required: true,
     },
+    photoUrl: String,
   },
+
   methods: {
     toggleEditing() {
       this.isEditing = !this.isEditing;

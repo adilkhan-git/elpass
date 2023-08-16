@@ -1,35 +1,37 @@
 <template lang="pug">
 div#app
-      div.main-content
-        h4 {{ $t("visitorCardsTitle") }}
-        hr.hr
-        q-btn(
-          class="add-visit-button",
-          color="primary",
-          :label="$t('addVisitButton')",
-          @click="showDialog = true"
-        )
-        div.search-bar
-          input(type="text", :placeholder="$t('searchPlaceholder.firstName')", v-model="searchName")
-          input(type="text", :placeholder="$t('searchPlaceholder.lastName')", v-model="searchLastName")
-          input(type="text", :placeholder="$t('searchPlaceholder.ID')", v-model="searchId")
-          input(type="text", :placeholder="$t('searchPlaceholder.phoneNumber')", v-model="searchPhone")
-          input(type="text", :placeholder="$t('searchPlaceholder.iin')", v-model="searchIin")
-    
-        div.visitor-cards
-          VisitorCard(
-            v-for="visitor in filteredVisitors",
-            :key="visitor.id",
-            :visitor="visitor",
-            @delete="deleteVisitor(visitor.id)",
-            @update="updateVisitor"
-          )
-    
-        VisitorCardDialog(
-          :show="showDialog",
-          @save="saveVisit",
-          @update:show="showDialog = $event"
-        )
+  div.main-content
+    h4 {{ $t("visitorCardsTitle") }}
+    hr.hr
+    q-btn(
+      class="add-visit-button",
+      color="primary",
+      :label="$t('addVisitButton')",
+      @click="showDialog = true"
+    )
+    div.search-bar
+      input(type="text", :placeholder="$t('searchPlaceholder.firstName')", v-model="searchName")
+      input(type="text", :placeholder="$t('searchPlaceholder.lastName')", v-model="searchLastName")
+      input(type="text", :placeholder="$t('searchPlaceholder.ID')", v-model="searchId")
+      input(type="text", :placeholder="$t('searchPlaceholder.phoneNumber')", v-model="searchPhone")
+      input(type="text", :placeholder="$t('searchPlaceholder.iin')", v-model="searchIin")
+
+    div.visitor-cards
+      VisitorCard(
+        v-for="visitor in filteredVisitors",
+        :key="visitor.id",
+        :visitor="visitor",
+        :photoUrl="visitor.photoUrl"
+        @delete="deleteVisitor(visitor.id)"
+        @update="updateVisitor"
+      )
+
+    VisitorCardDialog(
+      :show="showDialog",
+      @save="saveVisit",
+      @update:show="showDialog = $event"
+    )
+
 </template>
 
 <script>
@@ -60,6 +62,7 @@ export default {
         company: "",
         position: "",
         type: "",
+        photoUrl: "",
       },
     };
   },
@@ -111,6 +114,7 @@ export default {
   methods: {
     ...mapActions(["fetchCards", "addCard", "updateCard", "deleteCard"]),
     deleteVisitor(id) {
+      console.log("Photo URL in deleteVisitor:", this.photoUrl);
       this.deleteCard(id);
     },
     updateVisitor(visitor) {
@@ -142,6 +146,7 @@ export default {
         });
       this.showDialog = false;
     },
+
     addVisit() {
       this.saveVisit();
     },
