@@ -1,10 +1,10 @@
 <template>
   <q-page>
-    <h4>Списки</h4>
+    <h4>{{ $t("listsPage.lists") }}</h4>
     <q-table
       :rows="lists"
       row-key="id"
-      :columns="columns"
+      :columns="translatedColumns"
       virtual-scroll
       v-model:pagination="pagination"
     >
@@ -43,26 +43,26 @@ export default {
         {
           name: "name",
           required: true,
-          label: "Наименование списка",
+          label: "listName",
           align: "left",
           field: (row) => row.name,
         },
         {
           name: "date",
           required: true,
-          label: "Дата создания",
+          label: "creationDate",
           align: "left",
           field: (row) => row.date,
         },
         {
           name: "upload",
           required: true,
-          label: "Загрузка",
+          label: "upload",
           align: "left",
         },
         {
           name: "actions",
-          label: "Действия",
+          label: "actions",
           align: "left",
         },
       ],
@@ -70,6 +70,12 @@ export default {
   },
   computed: {
     ...mapState(["lists"]),
+    translatedColumns() {
+      return this.columns.map((column) => ({
+        ...column,
+        label: this.$t(`listsPage.${column.label}`),
+      }));
+    },
   },
   mounted() {
     this.fetchLists();
@@ -82,14 +88,14 @@ export default {
     confirmDelete(id) {
       this.$q
         .dialog({
-          title: "Подтвердите",
-          message: "Вы уверены, что хотите удалить этот список?",
+          title: this.$t("listsPage.confirmTitle"),
+          message: this.$t("listsPage.confirmMessage"),
           ok: {
-            label: "Удалить",
+            label: this.$t("listsPage.confirmDelete"),
             color: "negative",
           },
           cancel: {
-            label: "Отмена",
+            label: this.$t("listsPage.confirmCancel"),
             color: "primary",
           },
         })
@@ -105,7 +111,7 @@ export default {
             color: "green-4",
             textColor: "white",
             icon: "check",
-            message: "Список успешно удален",
+            message: this.$t("listsPage.deleteSuccess"),
           });
         })
         .catch(() => {
@@ -113,7 +119,7 @@ export default {
             color: "red-5",
             textColor: "white",
             icon: "error",
-            message: "Произошла ошибка при удалении списка",
+            message: this.$t("listsPage.deleteError"),
           });
         });
     },

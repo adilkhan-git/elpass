@@ -1,9 +1,13 @@
 <template>
   <q-page padding>
-    <h4>Список пользователей</h4>
-    <q-btn color="primary" label="Add User" @click="openDialogForNewUser" />
+    <h4>{{ $t("usersListTitle") }}</h4>
+    <q-btn
+      color="primary"
+      :label="$t('addUserButton')"
+      @click="openDialogForNewUser"
+    />
 
-    <q-table :rows="users" :columns="columns" row-key="id">
+    <q-table :rows="users" :columns="translatedColumns" row-key="id">
       <template v-slot:body-cell-actions="props">
         <q-td :props="props">
           <q-btn
@@ -54,46 +58,46 @@ export default {
         {
           name: "firstName",
           required: true,
-          label: "First Name",
+          label: "firstName",
           align: "left",
           field: (row) => row.firstName,
         },
         {
           name: "lastName",
           required: true,
-          label: "Last Name",
+          label: "lastName",
           align: "left",
           field: (row) => row.lastName,
         },
         {
           name: "email",
           required: true,
-          label: "Email",
+          label: "email",
           align: "left",
           field: (row) => row.email,
         },
         {
           name: "position",
           required: true,
-          label: "Position",
+          label: "positionTitle",
           align: "left",
           field: (row) => row.position,
         },
         {
           name: "role",
           required: true,
-          label: "Role",
+          label: "role",
           align: "left",
           field: (row) => row.role,
         },
         {
           name: "phoneNumber",
           required: true,
-          label: "Phone",
+          label: "phoneNumber",
           align: "left",
           field: (row) => row.phoneNumber,
         },
-        { name: "actions", label: "Actions", align: "left" },
+        { name: "actions", label: "actions", align: "left" },
       ],
 
       loading: true,
@@ -104,17 +108,23 @@ export default {
 
   computed: {
     ...mapState(["users"]),
+    translatedColumns() {
+      return this.columns.map((column) => ({
+        ...column,
+        label: this.$t(column.label),
+      }));
+    },
   },
 
   methods: {
     ...mapActions(["fetchUsers", "updateUser", "deleteUser", "addUser"]),
 
     openDialogForNewUser() {
-      this.editedUser = {}; 
+      this.editedUser = {};
       this.editDialog = true;
     },
     editUser(user) {
-      this.editedUser = Object.assign({}, user); 
+      this.editedUser = Object.assign({}, user);
       this.editDialog = true;
     },
     onUserSave(savedUser) {
@@ -158,15 +168,15 @@ export default {
     promptDeleteUser(userId) {
       this.$q
         .dialog({
-          title: "Confirm",
-          message: "Do you really want to delete this user?",
+          title: this.$t("confirmTitle"),
+          message: this.$t("confirmMessage"),
           ok: {
             color: "negative",
-            label: "Delete",
+            label: this.$t("confirmDelete"),
           },
           cancel: {
             color: "primary",
-            label: "Cancel",
+            label: this.$t("confirmCancel"),
           },
         })
         .onOk(() => {
@@ -181,7 +191,7 @@ export default {
             .catch(() => {
               this.$q.notify({
                 color: "red",
-                message: "Error deleting user",
+                message: this.$t("Error deleting user"),
                 icon: "error",
               });
             });
@@ -201,6 +211,4 @@ export default {
 };
 </script>
 
-<style>
-
-</style>
+<style></style>

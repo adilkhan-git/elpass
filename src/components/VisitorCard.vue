@@ -1,29 +1,30 @@
 <template lang="pug">
 q-card.card
-    q-card-section.card-header
-      img.visitor-photo(v-if="visitor.photoUrl" :src="visitor.photoUrl" alt="Visitor Photo")
-      .visitor-info
-        .visitor-name {{ visitor.firstName }} {{ visitor.lastName }}
-        .visitor-iin ИИН: {{ visitor.iin }}
-        .visitor-phone
-          q-icon(name="phone")
-          | {{ visitor.phoneNumber }}
-      .company-info
-        .company-name {{ visitor.company }}
-        .company-position {{ visitor.position }}
-    q-card-section.card-body
-      .id-type-last-login
-        .visitor-id ID: {{ visitor.id }}
-        .visitor-type {{ visitor.type }}
-        .last-login
-          q-icon(name="access_time" class="clock-icon")
-          | {{ formatDateTime(visitor.lastLogin || new Date()) }};
-    q-card-actions.align-right
-      q-btn( flat dense round icon="edit" color="orange" @click="toggleEditing")
-      q-btn(v-if="isAdmin" flat dense round icon="delete" color="negative" @click="deleteVisitor(visitor.id)")
-    visitor-card-dialog(:show="isEditing" :visitor="visitor" @save="saveVisitor")
+      q-card-section.card-header
+        img.visitor-photo(v-if="visitor.photoUrl" :src="visitor.photoUrl" alt="Visitor Photo")
+        .visitor-info
+          .visitor-name {{ visitor.firstName }} {{ visitor.lastName }}
+          .visitor-iin {{ $t('visitorCard.iin', { iin: visitor.iin }) }}
+          .visitor-phone
+            q-icon(name="phone")
+            | {{ $t('visitorCard.phoneNumber', { phoneNumber: visitor.phoneNumber }) }}
+        .company-info
+          .company-name {{ visitor.company }}
+          .company-position {{ visitor.position }}
+      q-card-section.card-body
+        .id-type-last-login
+          .visitor-id {{ $t('visitorCard.id', { id: visitor.id }) }}
+          .visitor-type {{ $t('visitorCard.type', { type: visitor.type }) }}
+          .last-login
+            q-icon(name="access_time" class="clock-icon")
+            | {{ $t('visitorCard.lastLogin', { lastLogin: formatDateTime(visitor.lastLogin || new Date()) }) }};
+      q-card-actions.align-right
+        q-btn( flat dense round icon="edit" color="orange" @click="toggleEditing")
+        q-btn(v-if="isAdmin" flat dense round icon="delete" color="negative" @click="deleteVisitor(visitor.id)")
+      visitor-card-dialog(:show="isEditing" :visitor="visitor" @save="saveVisitor")
 </template>
-
+  
+  
 <script>
 import { QCard, QCardSection, QCardActions, QBtn, QIcon } from "quasar";
 import VisitorCardDialog from "./VisitorCardDialog.vue";

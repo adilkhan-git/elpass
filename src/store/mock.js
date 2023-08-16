@@ -182,6 +182,19 @@ mock.onDelete(/\/terminals\/\d+/).reply((config) => {
     return [404, { message: "Terminal not found" }];
   }
 });
+mock.onPut(/\/terminals\/\d+/).reply((config) => {
+  const updatedTerminal = JSON.parse(config.data);
+  const index = terminals.findIndex(
+    (terminal) => terminal.id === updatedTerminal.id
+  );
+  if (index !== -1) {
+    terminals[index] = updatedTerminal;
+    console.log("Updated terminal with ID:", updatedTerminal.id);
+    return [200, updatedTerminal];
+  } else {
+    return [404, { message: "Terminal not found" }];
+  }
+});
 
 mock.onGet("/lists").reply(() => {
   console.log("fetched all lists");

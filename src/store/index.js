@@ -12,8 +12,12 @@ export default createStore({
     users: [],
     lists: [],
     terminals: [],
+    currentLanguage: "ru",
   },
   actions: {
+    changeLanguage(context, language) {
+      context.state.currentLanguage = language;
+    },
     async login({ state }, user) {
       try {
         const response = await axios.post("/login", {
@@ -82,6 +86,22 @@ export default createStore({
         }
       } catch (error) {
         console.error("Ошибка при удалении терминала:", error);
+      }
+    },
+    async updateTerminal({ state }, updatedTerminal) {
+      try {
+        const response = await axios.put(
+          `/terminals/${updatedTerminal.id}`,
+          updatedTerminal
+        );
+        const index = state.terminals.findIndex(
+          (terminal) => terminal.id === updatedTerminal.id
+        );
+        if (index !== -1) {
+          state.terminals[index] = response.data;
+        }
+      } catch (error) {
+        console.error("Ошибка при обновлении терминала:", error);
       }
     },
 

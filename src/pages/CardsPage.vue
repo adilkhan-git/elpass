@@ -1,36 +1,35 @@
 <template lang="pug">
 div#app
-    div.main-content
-      h4 Карточки посетителей
-      hr.hr
-      q-btn(
-        
-        class="add-visit-button",
-        color="primary",
-        label="Добавить посещение",
-        @click="showDialog = true"
-      )
-      div.search-bar
-        input(type="text", placeholder="Имя", v-model="searchName")
-        input(type="text", placeholder="Фамилия", v-model="searchLastName")
-        input(type="text", placeholder="ID", v-model="searchId")
-        input(type="text", placeholder="Телефон", v-model="searchPhone")
-        input(type="text", placeholder="ИИН", v-model="searchIin")
-  
-      div.visitor-cards
-        VisitorCard(
-          v-for="visitor in filteredVisitors",
-          :key="visitor.id",
-          :visitor="visitor",
-          @delete="deleteVisitor(visitor.id)",
-          @update="updateVisitor"
+      div.main-content
+        h4 {{ $t("visitorCardsTitle") }}
+        hr.hr
+        q-btn(
+          class="add-visit-button",
+          color="primary",
+          :label="$t('addVisitButton')",
+          @click="showDialog = true"
         )
-  
-      VisitorCardDialog(
-        :show="showDialog",
-        @save="saveVisit",
-        @update:show="showDialog = $event"
-      )
+        div.search-bar
+          input(type="text", :placeholder="$t('searchPlaceholder.firstName')", v-model="searchName")
+          input(type="text", :placeholder="$t('searchPlaceholder.lastName')", v-model="searchLastName")
+          input(type="text", :placeholder="$t('searchPlaceholder.ID')", v-model="searchId")
+          input(type="text", :placeholder="$t('searchPlaceholder.phoneNumber')", v-model="searchPhone")
+          input(type="text", :placeholder="$t('searchPlaceholder.iin')", v-model="searchIin")
+    
+        div.visitor-cards
+          VisitorCard(
+            v-for="visitor in filteredVisitors",
+            :key="visitor.id",
+            :visitor="visitor",
+            @delete="deleteVisitor(visitor.id)",
+            @update="updateVisitor"
+          )
+    
+        VisitorCardDialog(
+          :show="showDialog",
+          @save="saveVisit",
+          @update:show="showDialog = $event"
+        )
 </template>
 
 <script>

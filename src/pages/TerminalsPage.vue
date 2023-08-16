@@ -1,16 +1,16 @@
 <template>
   <q-page>
-    <h4>Терминалы</h4>
+    <h4>{{ $t("terminalsTitle") }}</h4>
     <q-btn
       color="primary"
-      label="Добавить терминал"
+      :label="$t('addTerminalButton')"
       @click="showAddTerminalDialog"
     />
 
     <q-table
       :rows="terminals"
       row-key="id"
-      :columns="columns"
+      :columns="translatedColumns"
       virtual-scroll
       v-model:pagination="pagination"
     >
@@ -25,13 +25,15 @@
     <terminal-dialog
       v-model="isDialogVisible"
       @added="fetchTerminals"
+      @closeDialog="closeDialog"
+      ref="dialog"
     ></terminal-dialog>
   </q-page>
 </template>
 
 <script>
 import { mapState, mapActions } from "vuex";
-import TerminalDialog from "../components/TerminalDialog.vue"
+import TerminalDialog from "../components/TerminalDialog.vue";
 
 export default {
   components: {
@@ -45,36 +47,36 @@ export default {
       },
       columns: [
         {
-          name: "name",
+          name: "terminal",
           required: true,
-          label: "Терминал",
+          label: "terminal",
           align: "left",
           field: (row) => row.name,
         },
         {
           name: "url",
           required: true,
-          label: "URL",
+          label: "url",
           align: "left",
           field: (row) => row.url,
         },
         {
           name: "type",
           required: true,
-          label: "Тип",
+          label: "type",
           align: "left",
           field: (row) => row.type,
         },
         {
           name: "status",
           required: true,
-          label: "Статус",
+          label: "status",
           align: "left",
           field: (row) => row.status,
         },
         {
           name: "actions",
-          label: "Действия",
+          label: "actions",
           align: "left",
         },
       ],
@@ -82,18 +84,33 @@ export default {
   },
   computed: {
     ...mapState(["terminals"]),
+    translatedColumns() {
+      return this.columns.map((column) => ({
+        ...column,
+        label: this.$t(column.label),
+      }));
+    },
   },
   mounted() {
     this.fetchTerminals();
   },
   methods: {
     ...mapActions(["fetchTerminals", "deleteTerminal"]),
+    closeDialog() {
+      this.isDialogVisible = false;
+    },
     showAddTerminalDialog() {
       this.isDialogVisible = true;
     },
     editTerminal(id) {
-      // TODO: логика редактирования терминала
+      const terminal = this.terminals.find((terminal) => terminal.id === id);
+      if (terminal) {
+        this.isDialogVisible = true;
+
+        this.$refs.dialog.openForEdit(terminal);
+      }
     },
+
     handleDelete(id) {
       this.$q
         .dialog({

@@ -12,6 +12,9 @@
         />
 
         <q-toolbar-title> elpass-frontend-vue-app </q-toolbar-title>
+        <q-btn flat @click="setLocale('en')">EN</q-btn>
+        <q-btn flat @click="setLocale('ru')">RU</q-btn>
+
         <q-btn
           flat
           dense
@@ -71,10 +74,12 @@
 </template>
 
 <script>
+import { mapState, mapActions } from "vuex";
 import { defineComponent, ref, computed } from "vue";
 import EssentialLink from "components/EssentialLink.vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
+import { i18n } from "boot/i18n";
 
 const linksList = [
   {
@@ -107,8 +112,8 @@ const settingsLinks = [
     link: "http://localhost:9000/#/terminals",
   },
   {
-    title: "Компании",
-    link: "http://localhost:9000/#/companies",
+    title: "Аудит",
+    link: "http://localhost:9000/#/audit",
   },
 ];
 
@@ -117,6 +122,14 @@ export default defineComponent({
 
   components: {
     EssentialLink,
+  },
+  computed: {
+    ...mapState(["currentLanguage"]),
+  },
+  methods: {
+    setLocale(locale) {
+      i18n.global.locale.value = locale;
+    },
   },
 
   setup() {
