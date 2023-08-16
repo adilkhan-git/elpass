@@ -1,20 +1,20 @@
 <template lang="pug">
-q-dialog(v-model="dialogVisible" @keyup.enter="save")
-        q-card.dialog
-          q-card-section
-            div.text-h6 {{ isEditMode ? "Edit User" : "Add User" }}
-          q-card-section
-            q-input(filled v-model="localUser.firstName" label="First Name" required)
-            q-input(filled v-model="localUser.lastName" label="Last Name" required)
-            q-input(filled v-model="localUser.email" label="Email" required)
-            q-input(filled v-model="localUser.position" label="Position" required)
-            q-input(filled v-model="localUser.role" label="Role" required)
-            q-input(filled v-model="localUser.phoneNumber" label="Phone Number" required)
-            q-input(type="password" filled v-model="localUser.password" label="Password" required)
-    
-          q-card-actions(align="right")
-            q-btn(flat label="Cancel" color="primary" @click="cancel")
-            q-btn(flat :label="isEditMode ? 'Edit' : 'Save'" color="primary" :disabled="!canSave" @click="save")
+q-dialog(v-model="dialogVisible" @hide="handleHide" @keyup.enter="save")
+          q-card.dialog
+            q-card-section
+              div.text-h6 {{ isEditMode ? $t('editUser') : $t('addUser') }}
+            q-card-section
+              q-input(filled v-model="localUser.firstName" :label="$t('firstName')" required)
+              q-input(filled v-model="localUser.lastName" :label="$t('lastName')" required)
+              q-input(filled v-model="localUser.email" :label="$t('email')" required)
+              q-input(filled v-model="localUser.position" :label="$t('positionTitle')" required)
+              q-input(filled v-model="localUser.role" :label="$t('role')" required)
+              q-input(filled v-model="localUser.phoneNumber" :label="$t('phoneNumber')" required)
+              q-input(type="password" filled v-model="localUser.password" :label="$t('password')" required)
+      
+            q-card-actions(align="right")
+              q-btn(flat :label="$t('cancel')" color="primary" @click="cancel")
+              q-btn(flat :label="isEditMode ? $t('edit') : $t('save')" color="primary" :disabled="!canSave" @click="save")
 </template>
 
 <script>
@@ -37,12 +37,16 @@ export default {
     user: {
       handler(val) {
         this.localUser = { ...val };
-        this.isEditMode = !!val;
+        this.isEditMode = val && val.id !== undefined;
       },
       immediate: true,
+      deep: true,
     },
   },
   methods: {
+    handleHide() {
+      this.$emit("update:show", false);
+    },
     closeDialog() {
       this.dialogVisible = false;
       this.$emit("update:show", false);

@@ -4,7 +4,7 @@
     <q-btn
       color="primary"
       :label="$t('addTerminalButton')"
-      @click="showAddTerminalDialog"
+      @click="openDialogForAddTerminal"
     />
 
     <q-table
@@ -26,7 +26,7 @@
       v-model="isDialogVisible"
       @added="fetchTerminals"
       @closeDialog="closeDialog"
-      ref="dialog"
+      ref="terminalDialog"
     ></terminal-dialog>
   </q-page>
 </template>
@@ -99,15 +99,21 @@ export default {
     closeDialog() {
       this.isDialogVisible = false;
     },
-    showAddTerminalDialog() {
-      this.isDialogVisible = true;
+    openDialogForAddTerminal() {
+      console.log("openDialogForAddTerminal called");
+      this.isDialogVisible = true; // Добавьте эту строку
+      this.$refs.terminalDialog.openForAdd();
     },
+
+    // showAddTerminalDialog() {
+    //   this.isDialogVisible = true;
+    // },
     editTerminal(id) {
       const terminal = this.terminals.find((terminal) => terminal.id === id);
       if (terminal) {
         this.isDialogVisible = true;
 
-        this.$refs.dialog.openForEdit(terminal);
+        this.$refs.terminalDialog.openForEdit(terminal);
       }
     },
 

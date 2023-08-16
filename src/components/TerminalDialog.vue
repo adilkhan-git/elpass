@@ -1,18 +1,17 @@
 <template lang="pug">
 q-dialog(v-model="internalDialogVisible" @keyup.enter="addAndClose")
-  q-card.dialog
-    q-card-section
-      div.text-h6 Add Terminal
-    q-card-section
-      q-form(ref="dialogForm")
-        q-input(filled v-model="terminal.name" label="Терминал" required)
-        q-input(filled v-model="terminal.url" label="URL" required)
-        q-input(filled v-model="terminal.type" label="Тип" required)
-        q-input(filled v-model="terminal.status" label="Статус" required)
-    q-card-actions(align="right")
-      q-btn(flat label="Cancel" color="primary" @click="closeAndReset")
-      q-btn(flat label="Добавить" color="primary" :disabled="!canAdd" @click="addAndClose")
-
+      q-card.dialog
+        q-card-section
+          div.text-h6 {{ editMode ? $t('editTerminal') : $t('addTerminal') }}
+        q-card-section
+          q-form(ref="dialogForm")
+            q-input(filled v-model="terminal.name" :label="$t('terminalName')" required)
+            q-input(filled v-model="terminal.url" :label="$t('terminalURL')" required)
+            q-input(filled v-model="terminal.type" :label="$t('terminalType')" required)
+            q-input(filled v-model="terminal.status" :label="$t('terminalStatus')" required)
+        q-card-actions(align="right")
+          q-btn(flat :label="$t('cancel')" color="primary" @click="closeAndReset")
+          q-btn(flat :label="editMode ? $t('edit') : $t('add')" color="primary" :disabled="!canAdd" @click="addAndClose")
 </template>
 
 <script>
@@ -41,11 +40,16 @@ export default {
   },
   methods: {
     ...mapActions(["updateTerminal", "addTerminal"]),
+    openForAdd() {
+      this.editMode = false;
+      this.internalDialogVisible = true;
+      this.clear();
+    },
 
     closeAndReset() {
       this.resetValidation();
       this.clear();
-      this.editMode = false; 
+      this.editMode = false;
       this.closeDialog();
     },
     openForEdit(terminal) {
@@ -65,7 +69,7 @@ export default {
               ? "Терминал успешно обновлен!"
               : "Терминал успешно добавлен!",
           });
-          this.editMode = false; 
+          this.editMode = false;
           this.closeAndReset();
         })
         .catch((error) => {

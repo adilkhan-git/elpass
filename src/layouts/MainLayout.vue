@@ -46,18 +46,22 @@
           </div>
         </q-item-label>
 
-        <q-item-label header> Essential Links </q-item-label>
+        <q-item-label header> {{ $t("essentialLinksHeader") }} </q-item-label>
 
         <EssentialLink
-          v-for="link in essentialLinks"
+          v-for="link in translatedLinksList"
           :key="link.title"
+          :caption="link.caption"
+          :title="link.title"
           v-bind="link"
         />
-        <q-item-label header> Администрирование </q-item-label>
-        <q-expansion-item label="Настройки" icon="settings">
+        <q-item-label header>{{ $t("administrationHeader") }} </q-item-label>
+        <q-expansion-item :label="$t('settings')" icon="settings">
           <EssentialLink
-            v-for="subLink in settingsLinks"
+            v-for="subLink in translatedSettingsLinks"
             :key="subLink.title"
+            :caption="subLink.caption"
+            :title="subLink.title"
             v-bind="subLink"
           />
         </q-expansion-item>
@@ -83,19 +87,19 @@ import { i18n } from "boot/i18n";
 
 const linksList = [
   {
-    title: "Посещения",
+    title: "visits",
     caption: "",
     icon: "folder_open",
     link: "http://localhost:9000/#/visits",
   },
   {
-    title: "Карточки посетителей",
+    title: "visitorCards",
     caption: "",
     icon: "person_pin",
     link: "http://localhost:9000/#/cards",
   },
   {
-    title: "Списки",
+    title: "lists",
     caption: "",
     icon: "format_list_bulleted",
     link: "http://localhost:9000/#/list",
@@ -104,15 +108,15 @@ const linksList = [
 
 const settingsLinks = [
   {
-    title: "Пользователи",
+    title: "users",
     link: "http://localhost:9000/#/userlist",
   },
   {
-    title: "Терминалы",
+    title: "terminals",
     link: "http://localhost:9000/#/terminals",
   },
   {
-    title: "Аудит",
+    title: "audit",
     link: "http://localhost:9000/#/audit",
   },
 ];
@@ -125,7 +129,24 @@ export default defineComponent({
   },
   computed: {
     ...mapState(["currentLanguage"]),
+    translatedLinksList() {
+      return linksList.map((link) => {
+        return {
+          ...link,
+          title: this.$t(link.title), // Преобразование в ключ перевода
+        };
+      });
+    },
+    translatedSettingsLinks() {
+      return settingsLinks.map((subLink) => {
+        return {
+          ...subLink,
+          title: this.$t(subLink.title), // Преобразование в ключ перевода
+        };
+      });
+    },
   },
+
   methods: {
     setLocale(locale) {
       i18n.global.locale.value = locale;
