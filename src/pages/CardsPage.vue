@@ -4,6 +4,7 @@ div#app
     h4 {{ $t("visitorCardsTitle") }}
     hr.hr
     q-btn(
+      v-if="isAdmin || isOperator"
       class="add-visit-button",
       color="primary",
       :label="$t('addVisitButton')",
@@ -138,11 +139,14 @@ export default {
     saveVisit(newVisit) {
       this.addCard(newVisit)
         .then(() => {
-          console.log("Карточка добавлена");
+          this.$q.notify("Карточка добавлена");
           this.closeModal();
         })
         .catch((error) => {
-          console.error("Ошибка");
+          this.$q.notify({
+            color: "negative",
+            message: "Ошибка при добавлении карточки",
+          });
         });
       this.showDialog = false;
     },

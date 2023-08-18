@@ -31,12 +31,15 @@
         <q-item-label header>
           <div class="profile-container">
             <img
+              @click="goToProfile"
               src="/avatar.svg"
               alt="Profile Avatar"
               class="profile-avatar"
             />
             <div class="profile-details">
-              <div class="profile-name">{{ userName }}</div>
+              <div class="profile-name" @click="goToProfile">
+                {{ userName }}
+              </div>
 
               <div class="profile-status">
                 <span class="online-dot"></span>
@@ -56,7 +59,11 @@
           v-bind="link"
         />
         <q-item-label header>{{ $t("administrationHeader") }} </q-item-label>
-        <q-expansion-item :label="$t('settings')" icon="settings">
+        <q-expansion-item
+          v-if="isAdmin"
+          :label="$t('settings')"
+          icon="settings"
+        >
           <EssentialLink
             v-for="subLink in translatedSettingsLinks"
             :key="subLink.title"
@@ -78,7 +85,8 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapState, mapGetters, mapActions } from "vuex";
+
 import { defineComponent, ref, computed } from "vue";
 import EssentialLink from "components/EssentialLink.vue";
 import { useStore } from "vuex";
@@ -128,7 +136,17 @@ export default defineComponent({
     EssentialLink,
   },
   computed: {
-    ...mapState(["currentLanguage"]),
+    ...mapState(["cards", "user"]),
+    ...mapGetters(["isAuthenticated"]),
+    isAdmin() {
+      return this.user && this.user.role === "admin";
+    },
+    isOperator() {
+      return this.user && this.user.role === "operator";
+    },
+    isEmployee() {
+      return this.user && this.user.role === "employee";
+    },
     translatedLinksList() {
       return linksList.map((link) => {
         return {
@@ -150,6 +168,13 @@ export default defineComponent({
   methods: {
     setLocale(locale) {
       i18n.global.locale.value = locale;
+    },
+    goToProfile() {
+      if (!this.isAuthenticated) {
+        this.$router.push("/login");
+      } else {
+        this.$router.push("/profile");
+      }
     },
   },
 

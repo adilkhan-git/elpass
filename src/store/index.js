@@ -14,6 +14,14 @@ export default createStore({
     terminals: [],
   },
   actions: {
+    updateUser({ state }, updatedUser) {
+      const userIndex = state.users.findIndex(
+        (user) => user.id === updatedUser.id
+      );
+      if (userIndex !== -1) {
+        state.users[userIndex] = updatedUser;
+      }
+    },
     async login({ state }, user) {
       try {
         const response = await axios.post("/login", {
@@ -40,6 +48,18 @@ export default createStore({
         console.error(error);
       }
     },
+    async addList({ state }, list) {
+      try {
+        const response = await axios.post("/lists", list);
+        if (response.status === 200) {
+          state.lists.push(response.data);
+        } else {
+          console.error("Error adding list:", response.status);
+        }
+      } catch (error) {
+        console.error("Error adding list:", error);
+      }
+    },
 
     async deleteList({ state }, id) {
       try {
@@ -50,6 +70,21 @@ export default createStore({
         }
       } catch (error) {
         console.error("Ошибка при удалении списка:", error);
+      }
+    },
+    async editList({ state }, list) {
+      try {
+        console.log("Sending data for edit:", list);
+        const response = await axios.put(`/lists/${list.id}`, list);
+        console.log("Received response for edit:", response);
+        const index = state.lists.findIndex((item) => item.id === list.id);
+        if (index !== -1) {
+          state.lists[index] = response.data;
+          console.log("Updated state after edit:", state.lists);
+        }
+        return response;
+      } catch (error) {
+        throw error;
       }
     },
 
@@ -216,5 +251,8 @@ export default createStore({
     getVisits: (state) => state.visits,
     getUsers: (state) => state.users,
     lists: (state) => state.lists,
+    isAuthenticated(state) {
+      return state.user && state.user.firstName !== "Guest";
+    },
   },
 });

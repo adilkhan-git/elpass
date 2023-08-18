@@ -1,3 +1,5 @@
+import store from "../store"; // Подключите ваш Vuex store
+
 const routes = [
   {
     path: "/",
@@ -7,20 +9,45 @@ const routes = [
       { path: "cards", component: () => import("pages/CardsPage.vue") },
       { path: "visits", component: () => import("pages/UserVisits.vue") },
       { path: "list", component: () => import("pages/ListPage.vue") },
-      { path: "userlist", component: () => import("pages/UserList.vue") },
-      { path: "terminals", component: () => import("pages/TerminalsPage.vue") },
-      { path: "audit", component: () => import("pages/AuditPage.vue") },
+      { path: "profile", component: () => import("pages/UserProfile.vue") },
       {
-        path: "cards/edit/:id",
-        component: () => import("pages/EditPage.vue"),
-        props: true, 
+        path: "userlist",
+        component: () => import("pages/UserList.vue"),
+        beforeEnter: (to, from, next) => {
+          if (store.state.user && store.state.user.role === "admin") {
+            next();
+          } else {
+            next("/login");
+          }
+        },
+      },
+      {
+        path: "terminals",
+        component: () => import("pages/TerminalsPage.vue"),
+        beforeEnter: (to, from, next) => {
+          if (store.state.user && store.state.user.role === "admin") {
+            next();
+          } else {
+            next("/login");
+          }
+        },
+      },
+      {
+        path: "audit",
+        component: () => import("pages/AuditPage.vue"),
+        beforeEnter: (to, from, next) => {
+          if (store.state.user && store.state.user.role === "admin") {
+            next();
+          } else {
+            next("/login");
+          }
+        },
       },
     ],
   },
-  // отдельные роуты для страниц логина и регистрации
-  { path: "/login", component: () => import("src/pages/LoginForm.vue") },
-  { path: "/register", component: () => import("src/pages/RegisterForm.vue") },
 
+  { path: "/login", component: () => import("src/pages/LoginForm.vue") },
+  ,
   // Always leave this as last one,
   // but you can also remove it
   {

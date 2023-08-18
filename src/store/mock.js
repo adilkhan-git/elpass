@@ -94,7 +94,7 @@ const users = [
     role: "admin",
     firstName: "Adilkhan",
     lastName: "Zamanbek",
-    position: "CEO",
+    position: "Developer",
     phoneNumber: "+77472229800",
   },
   {
@@ -205,6 +205,10 @@ mock.onGet("/lists").reply(() => {
   return [200, lists];
 });
 
+mock.onPost("/lists").reply((config) => {
+  return [200, list];
+});
+
 mock.onDelete(/\/lists\/\d+/).reply((config) => {
   const id = parseInt(config.url.split("/").pop());
   const index = lists.findIndex((list) => list.id === id);
@@ -214,6 +218,18 @@ mock.onDelete(/\/lists\/\d+/).reply((config) => {
     return [200];
   } else {
     return [404, { message: "List not found" }];
+  }
+});
+
+mock.onPut(/\/lists\/\d+/).reply((config) => {
+  const list = JSON.parse(config.data);
+  console.log("Received data for PUT:", list);
+  if (list.id && list.name) {
+    // Имитируйте обновление данных в моке здесь
+    console.log("Updated data in mock:", list);
+    return [200, list];
+  } else {
+    return [400, "Invalid data"];
   }
 });
 

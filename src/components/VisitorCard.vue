@@ -22,7 +22,7 @@ q-card.card
             q-icon(name="access_time" class="clock-icon")
             | {{ $t('visitorCard.lastLogin', { lastLogin: formatDateTime(visitor.lastLogin || new Date()) }) }};
       q-card-actions.align-right
-        q-btn( flat dense round icon="edit" color="orange" @click="toggleEditing")
+        q-btn(v-if="isAdmin" flat dense round icon="edit" color="orange" @click="toggleEditing")
         q-btn(v-if="isAdmin" flat dense round icon="delete" color="negative" @click="deleteVisitor(visitor.id)")
       visitor-card-dialog(:show="isEditing" :visitor="visitor" @save="saveVisitor")
 </template>
@@ -40,25 +40,17 @@ export default {
       isEditing: false,
     };
   },
-  computed: {
-    ...mapState(["user"]),
-    isAdmin() {
-      return this.user && this.user.role === "admin";
-    },
-    isOperator() {
-      return this.user && this.user.role === "operator";
-    },
-    isEmployee() {
-      return this.user && this.user.role === "employee";
-    },
-  },
+
   name: "VisitorCard",
   props: {
     visitor: {
       type: Object,
       required: true,
     },
-    photoUrl: String,
+    croppedImage: {
+      type: String,
+      default: "",
+    },
   },
 
   methods: {
@@ -82,6 +74,21 @@ export default {
         year: "numeric",
       };
       return new Date(dateTime).toLocaleString("ru-RU", options);
+    },
+  },
+  computed: {
+    ...mapState(["user"]),
+    isAdmin() {
+      return this.user && this.user.role === "admin";
+    },
+    isOperator() {
+      return this.user && this.user.role === "operator";
+    },
+    isEmployee() {
+      return this.user && this.user.role === "employee";
+    },
+    photoUrl() {
+      return this.croppedImage || this.visitor.photoUrl;
     },
   },
 };
