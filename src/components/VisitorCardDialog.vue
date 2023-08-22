@@ -59,8 +59,21 @@
         <button v-if="cameraStream" @click="capturePhoto">Capture Photo</button>
         <input type="file" @change="onFileChange" />
         <div class="photo-frame" v-if="imageUrl">
-          <img :src="imageUrl" />
+          <cropper
+            :src="imageUrl"
+            :stencil-props="{
+              aspectRatio: 1,
+              minWidth: 100,
+              minHeight: 100,
+              maxWidth: 300,
+              maxHeight: 300,
+              initialCoordinates: { left: 0, top: 0, width: 300, height: 300 },
+            }"
+            ref="cropper"
+            @change="handleCropChange"
+          />
         </div>
+        <button v-if="imageUrl" @click="cropImage">Crop Image</button>
       </q-card-section>
       <q-card-actions align="right">
         <q-btn
@@ -82,7 +95,13 @@
 </template>
 
 <script>
+import { Cropper } from "vue-advanced-cropper";
+import "vue-advanced-cropper/dist/style.css";
+
 export default {
+  components: {
+    Cropper,
+  },
   props: {
     show: Boolean,
     visitor: Object,
@@ -110,6 +129,17 @@ export default {
     },
   },
   methods: {
+    handleCropChange(coordinates) {
+      // The coordinates object contains the coordinates of the cropping area.
+      // Use it to crop the image and update the displayed image.
+      const canvas = this.$refs.cropper.getCanvas(coordinates);
+      this.displayedImageUrl = canvas.toDataURL("image/jpeg");
+    },
+    cropImage() {
+      const canvas = this.$refs.cropper.getCanvas();
+      this.imageUrl = canvas.toDataURL("image/jpeg");
+    },
+
     async startCamera() {
       try {
         this.cameraStream = await navigator.mediaDevices.getUserMedia({
