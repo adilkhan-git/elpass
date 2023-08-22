@@ -151,7 +151,7 @@ export default defineComponent({
       return linksList.map((link) => {
         return {
           ...link,
-          title: this.$t(link.title), // Преобразование в ключ перевода
+          title: this.$t(link.title), 
         };
       });
     },
@@ -159,7 +159,7 @@ export default defineComponent({
       return settingsLinks.map((subLink) => {
         return {
           ...subLink,
-          title: this.$t(subLink.title), // Преобразование в ключ перевода
+          title: this.$t(subLink.title), 
         };
       });
     },
@@ -207,9 +207,9 @@ export default defineComponent({
 <style>
 .icon-container {
   position: absolute;
-  bottom: 10px; /* Отступ снизу */
+  bottom: 10px; 
   left: 50%;
-  transform: translateX(-50%); /* Это центрирует иконку по горизонтали */
+  transform: translateX(-50%); 
 }
 
 .icon {

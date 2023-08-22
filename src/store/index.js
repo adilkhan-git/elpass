@@ -148,8 +148,8 @@ export default createStore({
       console.log("Updating user in Vuex action", user);
       return axios.put(`/users/${user.id}`, user).then((response) => {
         const index = state.users.findIndex((u) => u.id === user.id);
-        if (index !== -1) state.users[index] = response.data; // Здесь мы обновляем данные в state.
-        console.log("Updated user in state:", state.users[index]); // Лог после обновления
+        if (index !== -1) state.users[index] = response.data; 
+        console.log("Updated user in state:", state.users[index]); 
       });
     },
 

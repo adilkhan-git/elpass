@@ -1,13 +1,27 @@
 <template>
-  <q-dialog v-model="showDialog">
+  <q-dialog v-model="dialog">
     <q-card>
       <q-card-section>
-        <q-input v-model="list.name" label="List Name" />
+        <q-form @submit="handleSubmit">
+          <q-input
+            v-model="list.name"
+            label="List Name"
+            
+            required
+          />
+          <q-input
+            v-model="list.date"
+            label="Creation Date"
+            mask="YYYY-MM-DD"
+           
+            required
+          />
+          <div>
+            <q-btn label="Cancel" color="primary" flat @click="handleCancel" />
+            <q-btn type="submit" label="Confirm" color="positive" />
+          </div>
+        </q-form>
       </q-card-section>
-      <q-card-actions align="right">
-        <q-btn flat label="Cancel" @click="cancel" />
-        <q-btn label="Confirm" color="primary" @click="confirm" />
-      </q-card-actions>
     </q-card>
   </q-dialog>
 </template>
@@ -21,32 +35,37 @@ export default {
     },
     isEdit: {
       type: Boolean,
-      required: true,
+      default: false,
     },
   },
   data() {
     return {
-      showDialog: true,
-      list: Object.assign({}, this.initialList),
+      dialog: true,
+      list: {},
+      // requiredRule: (val) => (val && val.length > 0) || "Field is required",
     };
-  },
-  methods: {
-    confirm() {
-      this.$emit("confirm", this.list);
-      this.showDialog = false;
-    },
-    cancel() {
-      this.$emit("cancel");
-      this.showDialog = false;
-    },
   },
   watch: {
     initialList: {
-      handler(newValue) {
-        this.list = Object.assign({}, newValue);
+      immediate: true,
+      handler(value) {
+        this.list = { ...value };
       },
-      deep: true,
+    },
+  },
+  methods: {
+    handleSubmit(e) {
+      e.preventDefault();
+      this.$emit("confirm", this.list);
+    },
+    handleCancel() {
+      this.dialog = false;
+      this.$emit("cancel");
     },
   },
 };
 </script>
+
+<style scoped>
+
+</style>

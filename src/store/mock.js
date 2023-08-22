@@ -225,7 +225,6 @@ mock.onPut(/\/lists\/\d+/).reply((config) => {
   const list = JSON.parse(config.data);
   console.log("Received data for PUT:", list);
   if (list.id && list.name) {
-    // Имитируйте обновление данных в моке здесь
     console.log("Updated data in mock:", list);
     return [200, list];
   } else {
@@ -292,12 +291,12 @@ mock.onPost("/cards").reply((config) => {
   const newCard = JSON.parse(config.data);
   const cardId = cards.length + 1;
   newCard.id = cardId;
-  newCard.photoUrl = "";
   console.log(cards);
   cards.push(newCard);
   console.log("pushed");
   return [201, newCard];
 });
+
 mock.onPut(/\/cards\/\d+/).reply((config) => {
   const updatedCard = JSON.parse(config.data);
   const cardIndex = cards.findIndex((card) => card.id === updatedCard.id);

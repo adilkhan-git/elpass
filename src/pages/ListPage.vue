@@ -30,8 +30,20 @@
 
       <template v-slot:body-cell-upload="props">
         <q-td :props="props">
-          <q-btn icon="cloud_upload" color="orange" flat round />
-          <q-btn icon="block" color="black" flat round />
+          <q-btn
+            icon="cloud_upload"
+            color="orange"
+            flat
+            round
+            @click="openUploadDialog"
+          />
+          <q-btn
+            icon="block"
+            color="black"
+            flat
+            round
+            @click="openBlockDialog"
+          />
         </q-td>
       </template>
     </q-table>
@@ -42,6 +54,41 @@
       @confirm="handleConfirm"
       @cancel="handleCancel"
     />
+    <q-dialog v-model="uploadDialog">
+      <q-card>
+        <q-card-section>
+          <q-tabs v-model="tab" align="justify">
+            <q-tab name="csv" label="CSV" />
+            <q-tab name="zip" label="ZIP" />
+          </q-tabs>
+
+          <q-tab-panels v-model="tab">
+            <q-tab-panel name="csv">
+              <q-file
+                v-model="csvFiles"
+                label="Choose CSV files"
+                accept=".csv"
+                multiple
+              />
+              <q-btn label="Upload CSV" @click="uploadCSV" />
+            </q-tab-panel>
+            <q-tab-panel name="zip">
+              <q-file
+                v-model="zipFiles"
+                label="Choose ZIP files"
+                accept=".zip"
+                multiple
+              />
+              <q-btn label="Upload ZIP" @click="uploadZIP" />
+            </q-tab-panel>
+          </q-tab-panels>
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn flat label="Закрыть" @click="uploadDialog = false" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -55,6 +102,10 @@ export default {
   },
   data() {
     return {
+      uploadDialog: false,
+      tab: "csv",
+      csvFiles: [],
+      zipFiles: [],
       dialogShown: false,
       isEdit: false,
       selectedList: null,
@@ -113,6 +164,18 @@ export default {
   },
   methods: {
     ...mapActions(["fetchLists", "deleteList", "editList"]),
+    openUploadDialog() {
+      this.uploadDialog = true;
+    },
+    openBlockDialog() {
+      this.uploadDialog = true;
+    },
+    async uploadCSV() {
+      // Обработка и загрузка CSV файлов
+    },
+    async uploadZIP() {
+      // Обработка и загрузка ZIP файлов
+    },
     addList() {
       this.selectedList = { id: null, name: "", date: "" };
       this.isEdit = false;
@@ -124,15 +187,19 @@ export default {
       this.isEdit = true;
       this.dialogShown = true;
     },
-    handleConfirm(list) {
+    async handleConfirm(list) {
       console.log("Data received from dialog:", list);
       this.dialogShown = false;
-      if (this.isEdit) {
-        this.editList(list);
-      } else {
-        // logic for adding a new list
+      try {
+        if (this.isEdit) {
+          await this.editList(list);
+        } else {
+          await this.addList(list);
+        }
+        this.fetchLists();
+      } catch (error) {
+        console.error("Error handling list:", error);
       }
-      this.fetchLists();
     },
     handleCancel() {
       this.dialogShown = false;
@@ -142,19 +209,12 @@ export default {
       try {
         await this.editList(list);
         await this.fetchLists();
-        // Показать уведомление об успешном редактировании
-      } catch (error) {
-        // Обработать ошибку и показать уведомление
-      }
+      } catch (error) {}
     },
     async addListToStore(list) {
       try {
-        // Реализовать метод добавления списка в хранилище
         await this.fetchLists();
-        // Показать уведомление о успешном добавлении
-      } catch (error) {
-        // Обработать ошибку и показать уведомление
-      }
+      } catch (error) {}
     },
     confirmDelete(id) {
       this.$q
@@ -174,25 +234,24 @@ export default {
           this.handleDelete(id);
         });
     },
-    handleDelete(id) {
-      this.deleteList(id)
-        .then(() => {
-          this.fetchLists();
-          this.$q.notify({
-            color: "green-4",
-            textColor: "white",
-            icon: "check",
-            message: this.$t("listsPage.deleteSuccess"),
-          });
-        })
-        .catch(() => {
-          this.$q.notify({
-            color: "red-5",
-            textColor: "white",
-            icon: "error",
-            message: this.$t("listsPage.deleteError"),
-          });
+    async handleDelete(id) {
+      try {
+        await this.deleteList(id);
+        await this.fetchLists();
+        this.$q.notify({
+          color: "green-4",
+          textColor: "white",
+          icon: "check",
+          message: this.$t("listsPage.deleteSuccess"),
         });
+      } catch (error) {
+        this.$q.notify({
+          color: "red-5",
+          textColor: "white",
+          icon: "error",
+          message: this.$t("listsPage.deleteError"),
+        });
+      }
     },
   },
 };

@@ -1,38 +1,58 @@
-<template lang="pug">
-div#app
-  div.main-content
-    h4 {{ $t("visitorCardsTitle") }}
-    hr.hr
-    q-btn(
-      v-if="isAdmin || isOperator"
-      class="add-visit-button",
-      color="primary",
-      :label="$t('addVisitButton')",
-      @click="showDialog = true"
-    )
-    div.search-bar
-      input(type="text", :placeholder="$t('searchPlaceholder.firstName')", v-model="searchName")
-      input(type="text", :placeholder="$t('searchPlaceholder.lastName')", v-model="searchLastName")
-      input(type="text", :placeholder="$t('searchPlaceholder.ID')", v-model="searchId")
-      input(type="text", :placeholder="$t('searchPlaceholder.phoneNumber')", v-model="searchPhone")
-      input(type="text", :placeholder="$t('searchPlaceholder.iin')", v-model="searchIin")
-
-    div.visitor-cards
-      VisitorCard(
-        v-for="visitor in filteredVisitors",
-        :key="visitor.id",
-        :visitor="visitor",
-        :photoUrl="visitor.photoUrl"
-        @delete="deleteVisitor(visitor.id)"
-        @update="updateVisitor"
-      )
-
-    VisitorCardDialog(
-      :show="showDialog",
-      @save="saveVisit",
-      @update:show="showDialog = $event"
-    )
-
+<template>
+  <div id="app">
+    <div class="main-content">
+      <h4>{{ $t("visitorCardsTitle") }}</h4>
+      <hr class="hr" />
+      <q-btn
+        class="add-visit-button"
+        color="primary"
+        :label="$t('addVisitButton')"
+        @click="showDialog = true"
+      ></q-btn>
+      <div class="search-bar">
+        <input
+          type="text"
+          :placeholder="$t('searchPlaceholder.firstName')"
+          v-model="searchName"
+        />
+        <input
+          type="text"
+          :placeholder="$t('searchPlaceholder.lastName')"
+          v-model="searchLastName"
+        />
+        <input
+          type="text"
+          :placeholder="$t('searchPlaceholder.ID')"
+          v-model="searchId"
+        />
+        <input
+          type="text"
+          :placeholder="$t('searchPlaceholder.phoneNumber')"
+          v-model="searchPhone"
+        />
+        <input
+          type="text"
+          :placeholder="$t('searchPlaceholder.iin')"
+          v-model="searchIin"
+        />
+      </div>
+      <div class="visitor-cards">
+        <VisitorCard
+          v-for="visitor in filteredVisitors"
+          :key="visitor.id"
+          :visitor="visitor"
+          :photoUrl="visitor.photoUrl"
+          @delete="deleteVisitor(visitor.id)"
+          @update="updateVisitor"
+        />
+      </div>
+      <VisitorCardDialog
+        :show="showDialog"
+        @save="saveVisit"
+        @update:show="showDialog = $event"
+      />
+    </div>
+  </div>
 </template>
 
 <script>

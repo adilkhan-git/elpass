@@ -1,30 +1,70 @@
-<template lang="pug">
-q-card.card
-      q-card-section.card-header
-        
-        img.visitor-photo(:src="photoUrl" alt="Cropped image" )
-
-
-        .visitor-info
-          .visitor-name {{ visitor.firstName }} {{ visitor.lastName }}
-          .visitor-iin {{ $t('visitorCard.iin', { iin: visitor.iin }) }}
-          .visitor-phone
-            q-icon(name="phone")
-            | {{ $t('visitorCard.phoneNumber', { phoneNumber: visitor.phoneNumber }) }}
-        .company-info
-          .company-name {{ visitor.company }}
-          .company-position {{ visitor.position }}
-      q-card-section.card-body
-        .id-type-last-login
-          .visitor-id {{ $t('visitorCard.id', { id: visitor.id }) }}
-          .visitor-type {{ $t('visitorCard.type', { type: visitor.type }) }}
-          .last-login
-            q-icon(name="access_time" class="clock-icon")
-            | {{ $t('visitorCard.lastLogin', { lastLogin: formatDateTime(visitor.lastLogin || new Date()) }) }};
-      q-card-actions.align-right
-        q-btn(v-if="isAdmin" flat dense round icon="edit" color="orange" @click="toggleEditing")
-        q-btn(v-if="isAdmin" flat dense round icon="delete" color="negative" @click="deleteVisitor(visitor.id)")
-      visitor-card-dialog(:show="isEditing" :visitor="visitor" @save="saveVisitor")
+<template>
+  <q-card class="card">
+    <q-card-section class="card-header">
+      <img class="visitor-photo" :src="photoUrl" alt="Visitor Photo" />
+      <div class="visitor-info">
+        <div class="visitor-name">
+          {{ visitor.firstName }} {{ visitor.lastName }}
+        </div>
+        <div class="visitor-iin">
+          {{ $t("visitorCard.iin", { iin: visitor.iin }) }}
+        </div>
+        <div class="visitor-phone">
+          <q-icon name="phone" />
+          {{
+            $t("visitorCard.phoneNumber", { phoneNumber: visitor.phoneNumber })
+          }}
+        </div>
+      </div>
+      <div class="company-info">
+        <div class="company-name">{{ visitor.company }}</div>
+        <div class="company-position">{{ visitor.position }}</div>
+      </div>
+    </q-card-section>
+    <q-card-section class="card-body">
+      <div class="id-type-last-login">
+        <div class="visitor-id">
+          {{ $t("visitorCard.id", { id: visitor.id }) }}
+        </div>
+        <div class="visitor-type">
+          {{ $t("visitorCard.type", { type: visitor.type }) }}
+        </div>
+        <div class="last-login">
+          <q-icon name="access_time" class="clock-icon" />
+          {{
+            $t("visitorCard.lastLogin", {
+              lastLogin: formatDateTime(visitor.lastLogin || new Date()),
+            })
+          }}
+        </div>
+      </div>
+    </q-card-section>
+    <q-card-actions align="right">
+      <q-btn
+        v-if="isAdmin"
+        flat
+        dense
+        round
+        icon="edit"
+        color="orange"
+        @click="toggleEditing"
+      />
+      <q-btn
+        v-if="isAdmin"
+        flat
+        dense
+        round
+        icon="delete"
+        color="negative"
+        @click="deleteVisitor(visitor.id)"
+      />
+    </q-card-actions>
+    <visitor-card-dialog
+      :show="isEditing"
+      :visitor="visitor"
+      @save="saveVisitor"
+    />
+  </q-card>
 </template>
 
 <script>
@@ -40,7 +80,6 @@ export default {
       isEditing: false,
     };
   },
-
   name: "VisitorCard",
   props: {
     visitor: {
@@ -52,7 +91,6 @@ export default {
       default: "",
     },
   },
-
   methods: {
     toggleEditing() {
       this.isEditing = !this.isEditing;
@@ -76,6 +114,12 @@ export default {
       return new Date(dateTime).toLocaleString("ru-RU", options);
     },
   },
+  watch: {
+    croppedImage(newValue) {
+      console.log("Cropped Image:", newValue);
+    },
+  },
+
   computed: {
     ...mapState(["user"]),
     isAdmin() {
@@ -88,7 +132,9 @@ export default {
       return this.user && this.user.role === "employee";
     },
     photoUrl() {
-      return this.croppedImage || this.visitor.photoUrl;
+      const url = this.croppedImage || this.visitor.photoUrl;
+      console.log("Photo URL:", url);
+      return url;
     },
   },
 };
