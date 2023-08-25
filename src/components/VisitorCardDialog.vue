@@ -236,7 +236,7 @@ export default {
 
 <style scoped>
 .photo-frame {
-  width: 300px;
+  width: 400px;
   height: 300px;
   border: 3px solid #3d35a7;
   border-radius: 5%;

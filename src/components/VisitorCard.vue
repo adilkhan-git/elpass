@@ -4,38 +4,29 @@
       <img class="visitor-photo" :src="photoUrl" alt="Visitor Photo" />
       <div class="visitor-info">
         <div class="visitor-name">
-          {{ visitor.firstName }} {{ visitor.lastName }}
+          {{ visitor.name }}
+          <!-- Имя посетителя -->
         </div>
         <div class="visitor-iin">
-          {{ $t("visitorCard.iin", { iin: visitor.iin }) }}
+          {{ $t("visitorCard.iin", { iin: visitor.no }) }}
+          <!-- IIN посетителя -->
         </div>
-        <div class="visitor-phone">
-          <q-icon name="phone" />
-          {{
-            $t("visitorCard.phoneNumber", { phoneNumber: visitor.phoneNumber })
-          }}
-        </div>
-      </div>
-      <div class="company-info">
-        <div class="company-name">{{ visitor.company }}</div>
-        <div class="company-position">{{ visitor.position }}</div>
       </div>
     </q-card-section>
     <q-card-section class="card-body">
+      <div class="visitor-phone">
+        <!-- <q-icon name="phone" /> -->
+        {{ $t("visitorCard.phoneNumber", { phoneNumber: visitor.created_at }) }}
+        <!-- Дата создания (можно отформатировать как нужно) -->
+      </div>
       <div class="id-type-last-login">
         <div class="visitor-id">
-          {{ $t("visitorCard.id", { id: visitor.id }) }}
+          {{ $t("visitorCard.id", { id: visitor.uuid }) }}
+          <!-- UUID вместо id -->
         </div>
         <div class="visitor-type">
           {{ $t("visitorCard.type", { type: visitor.type }) }}
-        </div>
-        <div class="last-login">
-          <q-icon name="access_time" class="clock-icon" />
-          {{
-            $t("visitorCard.lastLogin", {
-              lastLogin: formatDateTime(visitor.lastLogin || new Date()),
-            })
-          }}
+          <!-- Тип посетителя -->
         </div>
       </div>
     </q-card-section>
@@ -132,9 +123,13 @@ export default {
       return this.user && this.user.role === "employee";
     },
     photoUrl() {
-      const url = this.croppedImage || this.visitor.photoUrl;
-      console.log("Photo URL:", url);
-      return url;
+      if (this.croppedImage) {
+        return this.croppedImage;
+      } else {
+        // Base URL where photos are hosted
+        const baseUrl = "https://astanahub.elpass.uz/storage/visits/red";
+        return `${baseUrl}/${this.visitor.photo}_.jpg`;
+      }
     },
   },
 };
@@ -210,6 +205,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 90px;
 }
 
 .id-type-last-login {

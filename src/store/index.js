@@ -12,6 +12,10 @@ export default createStore({
     users: [],
     lists: [],
     terminals: [],
+    cards: [],
+    totalCards: 0,
+    currentPage: 1,
+    itemsPerPage: 10,
   },
   actions: {
     updateUser({ state }, updatedUser) {
@@ -148,8 +152,8 @@ export default createStore({
       console.log("Updating user in Vuex action", user);
       return axios.put(`/users/${user.id}`, user).then((response) => {
         const index = state.users.findIndex((u) => u.id === user.id);
-        if (index !== -1) state.users[index] = response.data; 
-        console.log("Updated user in state:", state.users[index]); 
+        if (index !== -1) state.users[index] = response.data;
+        console.log("Updated user in state:", state.users[index]);
       });
     },
 
@@ -176,10 +180,10 @@ export default createStore({
         console.error(error);
       }
     },
-
     async fetchCards({ state }) {
       try {
-        const response = await axios.get("/cards");
+        const response = await axios.get(`https://api.elpass.uz/el_tcards`);
+
         state.cards = response.data;
       } catch (error) {
         console.error(error);
@@ -190,7 +194,7 @@ export default createStore({
         await axios.delete(`/cards/${id}`);
         state.cards = state.cards.filter((card) => card.id !== id);
       } catch (error) {
-        console.error(error);
+        console.error("Axios error:", error);
       }
     },
     async uploadPhoto({ state }, photo) {

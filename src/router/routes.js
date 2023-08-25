@@ -1,4 +1,4 @@
-import store from "../store"; // Подключите ваш Vuex store
+import store from "../store";
 
 const routes = [
   {
@@ -6,7 +6,11 @@ const routes = [
     component: () => import("layouts/MainLayout.vue"),
     children: [
       { path: "", component: () => import("pages/IndexPage.vue") },
-      { path: "cards", component: () => import("pages/CardsPage.vue") },
+      {
+        path: "cards",
+        component: () => import("pages/CardsPage.vue"),
+        props: (route) => ({ page: parseInt(route.query.page) || 1 }),
+      },
       { path: "visits", component: () => import("pages/UserVisits.vue") },
       { path: "list", component: () => import("pages/ListPage.vue") },
       { path: "profile", component: () => import("pages/UserProfile.vue") },
