@@ -14,7 +14,6 @@ export default createStore({
     terminals: [],
     cards: [],
     totalCards: 0,
-    currentPage: 1,
     itemsPerPage: 10,
   },
   actions: {
@@ -180,23 +179,57 @@ export default createStore({
         console.error(error);
       }
     },
-    async fetchCards({ state }) {
+    async fetchCards({ state }, { page = 1, limit = 10, filters = {} } = {}) {
       try {
-        const response = await axios.get(`https://api.elpass.uz/el_tcards`);
+        const offset = (page - 1) * limit;
+        let filterQuery = "";
 
+        if (filters.uuid) filterQuery += `&uuid=ilike.*${filters.uuid}*`;
+        if (filters.name) filterQuery += `&name=ilike.*${filters.name}*`;
+        if (filters.no) filterQuery += `&no=ilike.*${filters.no}*`;
+
+        const baseQueryString = filterQuery ? `?${filterQuery.substr(1)}` : "?";
+
+        const response = await axios.get(
+          `https://api.elpass.uz/el_tcards${baseQueryString}&limit=${limit}&offset=${offset}`
+        );
         state.cards = response.data;
+
+        let totalCards = 0;
+
+        const totalResponse = await axios.head(
+          `https://api.elpass.uz/el_tcards${baseQueryString}`
+        );
+        const totalRange = totalResponse.headers["content-range"];
+        if (totalRange) {
+          const matches = totalRange.match(/(\d+)-(\d+)\/\*/);
+          if (matches) {
+            totalCards = parseInt(matches[2], 10) + 1;
+          }
+        }
+
+        state.totalCards = totalCards || 0;
+        console.log("Total cards:", state.totalCards);
       } catch (error) {
-        console.error(error);
+        console.error("Error message:", error.message);
+        if (error.response) {
+          console.error("Error response data:", error.response.data);
+        }
       }
     },
-    async deleteCard({ state }, id) {
+
+    async deleteCard({ state }, uuid) {
       try {
-        await axios.delete(`/cards/${id}`);
-        state.cards = state.cards.filter((card) => card.id !== id);
+        await axios.delete(`https://api.elpass.uz/el_tcards?uuid=eq.${uuid}`);
+        state.cards = state.cards.filter((card) => card.uuid !== uuid);
       } catch (error) {
         console.error("Axios error:", error);
+        if (error.response) {
+          console.error("Error response data:", error.response.data);
+        }
       }
     },
+
     async uploadPhoto({ state }, photo) {
       try {
         const formData = new FormData();
@@ -246,10 +279,6 @@ export default createStore({
         throw error;
       }
     },
-
-    // setDialogVisible({ state }, value) {
-    //   state.dialogVisible = value;
-    // },
   },
   getters: {
     getVisits: (state) => state.visits,

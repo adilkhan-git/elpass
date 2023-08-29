@@ -9,13 +9,13 @@
         :label="$t('addVisitButton')"
         @click="showDialog = true"
       ></q-btn>
+      <input v-model="filterUuid" placeholder="UUID filter" />
+      <input v-model="filterName" placeholder="Name filter" />
+      <input v-model="filterNo" placeholder="No filter" />
+      <q-btn @click="applyFilters">Apply Filters</q-btn>
 
       <div class="visitor-cards">
-        <VisitorCard
-          v-for="card in paginatedCards"
-          :key="card.uuid"
-          :visitor="card"
-        />
+        <VisitorCard v-for="card in cards" :key="card.uuid" :visitor="card" />
       </div>
 
       <div class="pagination-container">
@@ -23,18 +23,21 @@
           v-model="currentPage"
           :max="totalPages"
           direction-links
+          boundary-links
+          boundary-numbers
+          :max-pages="12"
           outline
           color="orange"
           active-design="unelevated"
           active-color="primary"
           active-text-color="orange"
-          @update:modelValue="pageChanged"
+          @update:modelValue="handlePageChange"
         />
       </div>
 
       <VisitorCardDialog
         :show="showDialog"
-        @save="saveVisit"
+        @save="handleSaveVisit"
         @update:show="showDialog = $event"
       />
     </div>
@@ -56,32 +59,56 @@ export default {
     return {
       showDialog: false,
       currentPage: 1,
-      itemsPerPage: 6,
-      totalPages: 0,
+      itemsPerPage: 10,
+      filterUuid: "",
+      filterName: "",
+      filterNo: "",
     };
   },
   computed: {
     ...mapState(["cards", "totalCards"]),
-    paginatedCards() {
-      const start = (this.currentPage - 1) * this.itemsPerPage;
-      const end = this.currentPage * this.itemsPerPage;
-      return this.cards.slice(start, end);
+    totalPages() {
+      return Math.ceil(this.totalCards / this.itemsPerPage);
     },
   },
   methods: {
     ...mapActions(["fetchCards", "addCard", "updateCard", "deleteCard"]),
-    fetchAllCards() {
-      this.fetchCards().then(() => {
-        this.totalPages = Math.ceil(this.cards.length / this.itemsPerPage);
+    buildFilterQuery() {
+      let query = {};
+
+      if (this.filterUuid) query.uuid = this.filterUuid;
+      if (this.filterName) query.name = this.filterName;
+      if (this.filterNo) query.no = this.filterNo;
+      query.page = this.currentPage;
+
+      return query;
+    },
+    applyFilters() {
+      this.fetchCards({
+        page: this.currentPage,
+        limit: this.itemsPerPage,
+        filters: {
+          uuid: this.filterUuid,
+          name: this.filterName,
+          no: this.filterNo,
+        },
       });
+
+      this.$router
+        .push({ path: "/cards", query: this.buildFilterQuery() })
+        .catch((err) => {});
     },
 
-    pageChanged(page) {
-      this.$router.push({ query: { page: page } });
-      this.fetchAllCards();
+    handlePageChange(page) {
+      this.currentPage = page;
+      this.fetchCards({ page: this.currentPage, limit: this.itemsPerPage });
+
+      this.$router
+        .push({ path: "/cards", query: this.buildFilterQuery() })
+        .catch((err) => {});
     },
 
-    saveVisit(newVisit) {
+    handleSaveVisit(newVisit) {
       this.addCard(newVisit)
         .then(() => {
           this.$q.notify("Карточка добавлена");
@@ -95,21 +122,44 @@ export default {
         });
     },
   },
+  watch: {
+    "$route.query": {
+      immediate: true,
+      handler() {
+        this.filterUuid = this.$route.query.uuid || "";
+        this.filterName = this.$route.query.name || "";
+        this.filterNo = this.$route.query.no || "";
+        this.currentPage = parseInt(this.$route.query.page, 10) || 1;
+
+        this.fetchCards({
+          page: this.currentPage,
+          limit: this.itemsPerPage,
+          filters: {
+            uuid: this.filterUuid,
+            name: this.filterName,
+            no: this.filterNo,
+          },
+        });
+      },
+    },
+  },
   created() {
-    if (this.$route.query.page) {
-      this.currentPage = parseInt(this.$route.query.page, 10) || 1;
-    }
-    this.fetchAllCards();
+    this.fetchCards({ page: this.currentPage, limit: this.itemsPerPage });
   },
 };
 </script>
 
 <style>
+.search-container {
+  display: flex;
+  gap: 15px;
+}
 .pagination-container {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
+  margin-top: 20px;
 }
 
 .main-content {

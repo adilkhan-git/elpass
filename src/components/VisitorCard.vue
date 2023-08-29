@@ -17,12 +17,12 @@
       <div class="visitor-phone">
         <!-- <q-icon name="phone" /> -->
         {{ $t("visitorCard.phoneNumber", { phoneNumber: visitor.created_at }) }}
-        <!-- Дата создания (можно отформатировать как нужно) -->
+        <!-- Дата создания  -->
       </div>
       <div class="id-type-last-login">
         <div class="visitor-id">
           {{ $t("visitorCard.id", { id: visitor.uuid }) }}
-          <!-- UUID вместо id -->
+          <!-- UUID  -->
         </div>
         <div class="visitor-type">
           {{ $t("visitorCard.type", { type: visitor.type }) }}
@@ -69,6 +69,7 @@ export default {
   data() {
     return {
       isEditing: false,
+      showDeleteConfirmDialog: false,
     };
   },
   name: "VisitorCard",
@@ -90,8 +91,17 @@ export default {
       this.$emit("update", visitor);
       this.toggleEditing();
     },
-    deleteVisitor(id) {
-      this.$emit("delete", id);
+    openDeleteConfirm() {
+      this.showDeleteConfirmDialog = true;
+    },
+
+    closeDeleteConfirm() {
+      this.showDeleteConfirmDialog = false;
+    },
+
+    confirmDelete() {
+      this.$emit("delete", this.visitor.uuid);
+      this.showDeleteConfirmDialog = false;
     },
     formatDateTime(dateTime) {
       const options = {
@@ -126,7 +136,6 @@ export default {
       if (this.croppedImage) {
         return this.croppedImage;
       } else {
-        // Base URL where photos are hosted
         const baseUrl = "https://astanahub.elpass.uz/storage/visits/red";
         return `${baseUrl}/${this.visitor.photo}_.jpg`;
       }

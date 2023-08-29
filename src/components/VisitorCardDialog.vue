@@ -130,8 +130,6 @@ export default {
   },
   methods: {
     handleCropChange(coordinates) {
-      // The coordinates object contains the coordinates of the cropping area.
-      // Use it to crop the image and update the displayed image.
       const canvas = this.$refs.cropper.getCanvas(coordinates);
       this.displayedImageUrl = canvas.toDataURL("image/jpeg");
     },
@@ -189,7 +187,7 @@ export default {
     },
     handleHide() {
       this.$emit("update:show", false);
-      this.resetForm(); // Добавьте эту строку
+      this.resetForm();
     },
 
     cancel() {
