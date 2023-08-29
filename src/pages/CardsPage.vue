@@ -15,7 +15,12 @@
       <q-btn @click="applyFilters">Apply Filters</q-btn>
 
       <div class="visitor-cards">
-        <VisitorCard v-for="card in cards" :key="card.uuid" :visitor="card" />
+        <VisitorCard
+          v-for="card in cards"
+          :key="card.uuid"
+          :visitor="card"
+          @delete="handleDeleteCard"
+        />
       </div>
 
       <div class="pagination-container">
@@ -73,6 +78,20 @@ export default {
   },
   methods: {
     ...mapActions(["fetchCards", "addCard", "updateCard", "deleteCard"]),
+    async handleDeleteCard(uuid) {
+      try {
+        await this.deleteCard(uuid);
+        this.$q.notify({
+          color: "positive",
+          message: "Карточка успешно удалена",
+        });
+      } catch (error) {
+        this.$q.notify({
+          color: "negative",
+          message: "Ошибка при удалении карточки",
+        });
+      }
+    },
     buildFilterQuery() {
       let query = {};
 

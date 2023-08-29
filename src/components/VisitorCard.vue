@@ -41,13 +41,12 @@
         @click="toggleEditing"
       />
       <q-btn
-        v-if="isAdmin"
         flat
         dense
         round
         icon="delete"
         color="negative"
-        @click="deleteVisitor(visitor.id)"
+        @click="openDeleteConfirm"
       />
     </q-card-actions>
     <visitor-card-dialog
@@ -55,6 +54,17 @@
       :visitor="visitor"
       @save="saveVisitor"
     />
+    <q-dialog v-model="showDeleteConfirmDialog" persistent>
+      <q-card>
+        <q-card-section>
+          Вы уверены, что хотите удалить эту карточку?
+        </q-card-section>
+        <q-card-actions>
+          <q-btn flat label="Отмена" v-close-popup />
+          <q-btn flat label="Удалить" color="negative" @click="confirmDelete" />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-card>
 </template>
 
@@ -84,6 +94,17 @@ export default {
     },
   },
   methods: {
+    openDeleteConfirm() {
+      this.showDeleteConfirmDialog = true;
+    },
+    closeDeleteConfirm() {
+      this.showDeleteConfirmDialog = false;
+    },
+    confirmDelete() {
+      this.$emit("delete", this.visitor.uuid);
+      this.closeDeleteConfirm();
+    },
+
     toggleEditing() {
       this.isEditing = !this.isEditing;
     },
@@ -91,17 +112,8 @@ export default {
       this.$emit("update", visitor);
       this.toggleEditing();
     },
-    openDeleteConfirm() {
-      this.showDeleteConfirmDialog = true;
-    },
-
-    closeDeleteConfirm() {
-      this.showDeleteConfirmDialog = false;
-    },
-
-    confirmDelete() {
+    deleteVisitor() {
       this.$emit("delete", this.visitor.uuid);
-      this.showDeleteConfirmDialog = false;
     },
     formatDateTime(dateTime) {
       const options = {
