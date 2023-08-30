@@ -1,6 +1,6 @@
 import { createStore } from "vuex";
 import axios from "axios";
-import "./mock.js";
+import { api } from "./api";
 
 export default createStore({
   state: {
@@ -15,6 +15,8 @@ export default createStore({
     cards: [],
     totalCards: 0,
     itemsPerPage: 10,
+    mock: false,
+    debug: false,
   },
   actions: {
     updateUser({ state }, updatedUser) {
@@ -27,7 +29,8 @@ export default createStore({
     },
     async login({ state }, user) {
       try {
-        const response = await axios.post("/login", {
+        // const response = await axios.post("/login", {
+        const response = await api.login({
           email: user.email,
           password: user.password,
         });
@@ -179,6 +182,7 @@ export default createStore({
         console.error(error);
       }
     },
+
     async fetchCards({ state }, { page = 1, limit = 10, filters = {} } = {}) {
       try {
         const offset = (page - 1) * limit;
@@ -230,18 +234,19 @@ export default createStore({
       }
     },
 
-    async uploadPhoto({ state }, photo) {
-      try {
-        const formData = new FormData();
-        formData.append("file", photo);
-        const response = await axios.post("/upload-photo", formData);
-        console.log("Uploaded photo URL:", response.data.photoUrl);
-        return response.data.photoUrl;
-      } catch (error) {
-        console.error("Ошибка при загрузке фотографии:", error);
-        throw error;
-      }
-    },
+    // async uploadPhoto({ state }, photo) {
+    //   try {
+    //     const formData = new FormData();
+    //     formData.append("file", photo);
+    //     const response = await axios.post("/upload-photo", formData);
+    //     console.log("Uploaded photo URL:", response.data.photoUrl);
+    //     return response.data.photoUrl;
+    //   } catch (error) {
+
+    //     console.error("Ошибка при загрузке фотографии:", error);
+    //     throw error;
+    //   }
+    // },
 
     async addCard({ dispatch, state }, card) {
       try {
