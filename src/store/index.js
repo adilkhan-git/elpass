@@ -206,7 +206,6 @@ export default createStore({
       }).then((data)=>{
         state.cards = data.cards;
         state.totalCards = data.totalCards;
-        console.log("Total cards:", state.totalCards);
       });
     },
 
