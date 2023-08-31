@@ -103,30 +103,17 @@ export default {
       return query;
     },
     applyFilters() {
-      this.fetchCards({
-        page: this.currentPage,
-        limit: this.itemsPerPage,
-        filters: {
-          uuid: this.filterUuid,
-          name: this.filterName,
-          no: this.filterNo,
-        },
-      });
-
       this.$router
         .push({ path: "/cards", query: this.buildFilterQuery() })
-        .catch((err) => {});
+        .catch((err) => console.error("Router error:", err));
     },
 
     handlePageChange(page) {
       this.currentPage = page;
-      this.fetchCards({ page: this.currentPage, limit: this.itemsPerPage });
-
       this.$router
         .push({ path: "/cards", query: this.buildFilterQuery() })
-        .catch((err) => {});
+        .catch((err) => console.error("Router error:", err));
     },
-
     handleSaveVisit(newVisit) {
       this.addCard(newVisit)
         .then(() => {

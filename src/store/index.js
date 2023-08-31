@@ -1,6 +1,6 @@
 import { createStore } from "vuex";
 import axios from "axios";
-import "./mock.js";
+import { api } from "./api";
 
 export default createStore({
   state: {
@@ -15,6 +15,8 @@ export default createStore({
     cards: [],
     totalCards: 0,
     itemsPerPage: 10,
+    mock: true,
+    debug: false,
   },
   actions: {
     updateUser({ state }, updatedUser) {
@@ -27,7 +29,8 @@ export default createStore({
     },
     async login({ state }, user) {
       try {
-        const response = await axios.post("/login", {
+        // const response = await axios.post("/login", {
+        const response = await api.login({
           email: user.email,
           password: user.password,
         });
@@ -179,39 +182,21 @@ export default createStore({
         console.error(error);
       }
     },
+
     async fetchCards({ state }, { page = 1, limit = 10, filters = {} } = {}) {
       try {
-        const offset = (page - 1) * limit;
-        let filterQuery = "";
+        const { cards, totalCards } = await api.fetchCards({
+          page,
+          limit,
+          filters,
+        });
 
-        if (filters.uuid) filterQuery += `&uuid=ilike.*${filters.uuid}*`;
-        if (filters.name) filterQuery += `&name=ilike.*${filters.name}*`;
-        if (filters.no) filterQuery += `&no=ilike.*${filters.no}*`;
+        state.cards = cards;
+        state.totalCards = totalCards;
 
-        const baseQueryString = filterQuery ? `?${filterQuery.substr(1)}` : "?";
-
-        const response = await axios.get(
-          `https://api.elpass.uz/el_tcards${baseQueryString}&limit=${limit}&offset=${offset}`
-        );
-        state.cards = response.data;
-
-        let totalCards = 0;
-
-        const totalResponse = await axios.head(
-          `https://api.elpass.uz/el_tcards${baseQueryString}`
-        );
-        const totalRange = totalResponse.headers["content-range"];
-        if (totalRange) {
-          const matches = totalRange.match(/(\d+)-(\d+)\/\*/);
-          if (matches) {
-            totalCards = parseInt(matches[2], 10) + 1;
-          }
-        }
-
-        state.totalCards = totalCards || 0;
         console.log("Total cards:", state.totalCards);
       } catch (error) {
-        console.error("Error message:", error.message);
+        console.error("Error message:", error);
         if (error.response) {
           console.error("Error response data:", error.response.data);
         }
@@ -230,18 +215,19 @@ export default createStore({
       }
     },
 
-    async uploadPhoto({ state }, photo) {
-      try {
-        const formData = new FormData();
-        formData.append("file", photo);
-        const response = await axios.post("/upload-photo", formData);
-        console.log("Uploaded photo URL:", response.data.photoUrl);
-        return response.data.photoUrl;
-      } catch (error) {
-        console.error("Ошибка при загрузке фотографии:", error);
-        throw error;
-      }
-    },
+    // async uploadPhoto({ state }, photo) {
+    //   try {
+    //     const formData = new FormData();
+    //     formData.append("file", photo);
+    //     const response = await axios.post("/upload-photo", formData);
+    //     console.log("Uploaded photo URL:", response.data.photoUrl);
+    //     return response.data.photoUrl;
+    //   } catch (error) {
+
+    //     console.error("Ошибка при загрузке фотографии:", error);
+    //     throw error;
+    //   }
+    // },
 
     async addCard({ dispatch, state }, card) {
       try {
