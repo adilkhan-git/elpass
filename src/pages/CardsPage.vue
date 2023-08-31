@@ -150,7 +150,7 @@ export default {
     },
   },
   created() {
-    this.fetchCards({ page: this.currentPage, limit: this.itemsPerPage });
+    // this.fetchCards({ page: this.currentPage, limit: this.itemsPerPage }); // TJ: ненужно так как сверху в ватчере стоит immediate: true
   },
 };
 </script>

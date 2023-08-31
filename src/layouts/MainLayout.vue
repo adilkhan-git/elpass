@@ -98,34 +98,34 @@ const linksList = [
     title: "visits",
     caption: "",
     icon: "folder_open",
-    link: "http://localhost:9000/#/visits",
+    link: "#/visits",
   },
   {
     title: "visitorCards",
     caption: "",
     icon: "person_pin",
-    link: "http://localhost:9000/#/cards",
+    link: "#/cards",
   },
   {
     title: "lists",
     caption: "",
     icon: "format_list_bulleted",
-    link: "http://localhost:9000/#/list",
+    link: "#/list",
   },
 ];
 
 const settingsLinks = [
   {
     title: "users",
-    link: "http://localhost:9000/#/userlist",
+    link: "/#/userlist",
   },
   {
     title: "terminals",
-    link: "http://localhost:9000/#/terminals",
+    link: "/#/terminals",
   },
   {
     title: "audit",
-    link: "http://localhost:9000/#/audit",
+    link: "/#/audit",
   },
 ];
 

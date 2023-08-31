@@ -1,6 +1,7 @@
 import { createStore } from "vuex";
 import axios from "axios";
 import { api } from "./api";
+import { http } from "boot/axios";
 
 export default createStore({
   state: {
@@ -27,20 +28,14 @@ export default createStore({
         state.users[userIndex] = updatedUser;
       }
     },
-    async login({ state }, user) {
-      try {
-        // const response = await axios.post("/login", {
-        const response = await api.login({
+    login({ state }, user) {
+        return api.login({
           email: user.email,
           password: user.password,
+        }).then((resp)=>{
+          state.user = resp.data.user;
+          state.token = resp.data.token;
         });
-        state.user = response.data.user;
-        state.token = response.data.token;
-        return response;
-      } catch (error) {
-        console.error(error);
-        throw error;
-      }
     },
     logout({ state }) {
       state.user = null;
@@ -48,7 +43,7 @@ export default createStore({
     },
     async fetchLists({ state }) {
       try {
-        const response = await axios.get("/lists");
+        const response = await http.get("/lists");
         state.lists = response.data;
       } catch (error) {
         console.error(error);
@@ -183,24 +178,35 @@ export default createStore({
       }
     },
 
-    async fetchCards({ state }, { page = 1, limit = 10, filters = {} } = {}) {
-      try {
-        const { cards, totalCards } = await api.fetchCards({
-          page,
-          limit,
-          filters,
-        });
+    // async fetchCards({ state }, { page = 1, limit = 10, filters = {} } = {}) {
+    //   try {
+    //     const { cards, totalCards } = await api.fetchCards({
+    //       page,
+    //       limit,
+    //       filters,
+    //     });
 
-        state.cards = cards;
-        state.totalCards = totalCards;
+    //     state.cards = cards;
+    //     state.totalCards = totalCards;
 
-        console.log("Total cards:", state.totalCards);
-      } catch (error) {
-        console.error("Error message:", error);
-        if (error.response) {
-          console.error("Error response data:", error.response.data);
-        }
-      }
+    //     console.log("Total cards:", state.totalCards);
+    //   } catch (error) {
+    //     console.error("Error message:", error);
+    //     if (error.response) {
+    //       console.error("Error response data:", error.response.data);
+    //     }
+    //   }
+    // },
+
+    fetchCards({ state }, { page = 1, limit = 10, filters = {} } = {}) {
+      return api.fetchCards({
+        page,
+        limit,
+        filters,
+      }).then((data)=>{
+        state.cards = data.cards;
+        state.totalCards = data.totalCards;
+      });
     },
 
     async deleteCard({ state }, uuid) {

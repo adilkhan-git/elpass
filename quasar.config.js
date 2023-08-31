@@ -63,6 +63,10 @@ module.exports = configure(function (/* ctx */) {
       // publicPath: '/',
       // analyze: true,
       // env: {},
+      env: {
+        VERSION: require('./package.json').version,
+        CORDOVA: false,
+      },
       // rawDefine: {}
       // ignorePublicFolder: true,
       // minify: false,
@@ -80,7 +84,20 @@ module.exports = configure(function (/* ctx */) {
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
     devServer: {
       // https: true
-      open: true, // opens browser window automatically
+      open: false, // opens browser window automatically
+      port: 8080,
+      allowedHosts: 'all',
+      // public: 'https://app.rekassa.dev', 
+      // publicPath: '/',
+      headers: {
+        'X-Server-Name': 'DEV'
+      },
+      hmr : { 
+        clientPort: 443,
+      },
+      // client: {
+      //   webSocketURL: 'auto://app.elpass.uz/ws'
+      // },
     },
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
