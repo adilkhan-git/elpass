@@ -15,7 +15,7 @@ export default createStore({
     cards: [],
     totalCards: 0,
     itemsPerPage: 10,
-    mock: false,
+    mock: true,
     debug: false,
   },
   actions: {
@@ -185,37 +185,18 @@ export default createStore({
 
     async fetchCards({ state }, { page = 1, limit = 10, filters = {} } = {}) {
       try {
-        const offset = (page - 1) * limit;
-        let filterQuery = "";
+        const { cards, totalCards } = await api.fetchCards({
+          page,
+          limit,
+          filters,
+        });
 
-        if (filters.uuid) filterQuery += `&uuid=ilike.*${filters.uuid}*`;
-        if (filters.name) filterQuery += `&name=ilike.*${filters.name}*`;
-        if (filters.no) filterQuery += `&no=ilike.*${filters.no}*`;
+        state.cards = cards;
+        state.totalCards = totalCards;
 
-        const baseQueryString = filterQuery ? `?${filterQuery.substr(1)}` : "?";
-
-        const response = await axios.get(
-          `https://api.elpass.uz/el_tcards${baseQueryString}&limit=${limit}&offset=${offset}`
-        );
-        state.cards = response.data;
-
-        let totalCards = 0;
-
-        const totalResponse = await axios.head(
-          `https://api.elpass.uz/el_tcards${baseQueryString}`
-        );
-        const totalRange = totalResponse.headers["content-range"];
-        if (totalRange) {
-          const matches = totalRange.match(/(\d+)-(\d+)\/\*/);
-          if (matches) {
-            totalCards = parseInt(matches[2], 10) + 1;
-          }
-        }
-
-        state.totalCards = totalCards || 0;
         console.log("Total cards:", state.totalCards);
       } catch (error) {
-        console.error("Error message:", error.message);
+        console.error("Error message:", error);
         if (error.response) {
           console.error("Error response data:", error.response.data);
         }

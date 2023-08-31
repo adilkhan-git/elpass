@@ -1,10 +1,10 @@
 import MockAdapter from "axios-mock-adapter";
 import { http } from "boot/axios";
-import { mock } from "../store/mock";
+// import { mock } from "../store/mock";
 import { boot } from "quasar/wrappers";
 
 export default boot(({ app, store }) => {
-  mock = new MockAdapter(http);
+  let mock = new MockAdapter(http);
   const cards = [
     {
       uuid: "fddd3df1",
@@ -334,7 +334,7 @@ export default boot(({ app, store }) => {
     return [200, { photoUrl: uploadedImageURL }];
   });
 
-  //   mock.onGet("/cards").reply(200, cards);
+  // mock.onGet("/cards").reply(200, cards);
 
   mock.onPost("/cards").reply((config) => {
     const newCard = JSON.parse(config.data);
@@ -402,7 +402,7 @@ export default boot(({ app, store }) => {
         mock.restore();
       } else {
         console.debug("--> demoMode mock enabled", v);
-        $http.defaults.adapter = mock;
+        http.defaults.adapter = mock;
 
         // $http.defaults.adapter = null;
       }
