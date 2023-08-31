@@ -1,8 +1,12 @@
 import { http } from "boot/axios";
+import queryString from 'query-string';
 
 const api = {
   login(email, password) {
     return http.post("/login", { email, password });
+  },
+  fetchWithPagination(){
+
   },
   async fetchCards({ page = 1, limit = 10, filters = {} } = {}) {
     const offset = (page - 1) * limit;
@@ -15,11 +19,11 @@ const api = {
     const baseQueryString = filterQuery ? `?${filterQuery.substr(1)}` : "?";
 
     const response = await http.get(
-      `https://api.elpass.uz/el_tcards${baseQueryString}&limit=${limit}&offset=${offset}`
+      `/el_tcards${baseQueryString}&limit=${limit}&offset=${offset}`
     );
 
     const totalResponse = await http.head(
-      `https://api.elpass.uz/el_tcards${baseQueryString}`
+      `/el_tcards${baseQueryString}`
     );
     const totalRange = totalResponse.headers["content-range"];
     let totalCards = 0;
