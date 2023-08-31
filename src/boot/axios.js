@@ -7,8 +7,22 @@ import { Notify } from "quasar";
 
 let _debug = false;
 
-const http = axios.create();
-let log = null;
+const http = axios.create({
+  baseURL: 'https://api.elpass.uz'
+});
+
+let log = function (message) {
+  if (message && _debug) {
+    Notify.create({ group: "axios", message, color: "primary" });
+    console.log("log", ...arguments);
+  }
+};
+
+log.error = function (err) {
+  Notify.create({ group: "axios", message: err, type: "negative" });
+  // console.error('axios log error',...arguments);
+};
+
 
 export default boot(({ app, store }) => {
   app.config.globalProperties.$http = http;
@@ -23,22 +37,6 @@ export default boot(({ app, store }) => {
     { immediate: true }
   );
 
-  // const controller = new AbortController();
-
-  log = function (message) {
-    if (message && _debug) {
-      Notify.create({ group: "axios", message, color: "primary" });
-      console.log("log", ...arguments);
-    }
-  };
-
-  log.error = function (err) {
-    Notify.create({ group: "axios", message: err, type: "negative" });
-    // console.error('axios log error',...arguments);
-  };
-
-  let currentRequest = null;
-
   let requestHdl = (config, isFullfilled) => {
     if (config.title) log(config.title);
     if (config.notify)
@@ -48,15 +46,10 @@ export default boot(({ app, store }) => {
         spinner: true,
         timeout: 0,
       });
-
-    // console.log('----config--->',config,'CHUHA');
-
-    
-
     return config;
   };
+
   let responseHdl = (res) => {
-    // Notify.create({message:res.config?.title||res.config.url,type: 'positive'});
     if (res.config && res.config._notify)
       res.config._notify({
         icon: "done",
@@ -65,7 +58,8 @@ export default boot(({ app, store }) => {
         timeout: 2500,
         color: "primary",
       });
-    return res.data && res.data.data ? res.data.data : res.data;
+    // return res.data && res.data.data ? res.data.data : res.data;
+    return res;
   };
 
   let handleErr = async (err) => {
@@ -88,16 +82,6 @@ export default boot(({ app, store }) => {
     message =
       i18n.global.t("Ошибка!") + " " + message + i18n.global.t(subtitle);
 
-    console.log("subtitle", subtitle, subtitle == "canceled");
-
-    // if (data?.errors?.message == "Token expired") {
-    //   console.log("Obtaining new token");
-    //   const originalRequest = err.config;
-    //   originalRequest._retry = true;
-    //   await HTTPOFD.token();
-    //   return http(originalRequest);
-    // }
-
     if (err.config && err.config._notify)
       err.config._notify({
         icon: "error",
@@ -109,15 +93,10 @@ export default boot(({ app, store }) => {
       });
     else if (subtitle == "canceled") log.error(i18n.global.t(subtitle));
     else log.error(message);
-    // else Notify.create({message,type: 'negative', position:'top'});
-
-    // currentRequest.response = { data, message };
-
     return Promise.reject(message);
   };
 
   http.interceptors.response.use(responseHdl, handleErr);
-
   http.interceptors.request.use(requestHdl, handleErr);
 });
 
