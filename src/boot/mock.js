@@ -1,14 +1,40 @@
 import MockAdapter from "axios-mock-adapter";
 import { http } from "boot/axios";
-// import { mock } from "../store/mock";
 import { boot } from "quasar/wrappers";
 
-let mockAdapter
+let mockAdapter;
+
+/////////////////////////////////////////////////
 
 export default boot(({ app, store }) => {
+
   let mock = new MockAdapter(http);
   mockAdapter = http.defaults.adapter;
-  
+  bindMockRoutes(mock);
+
+  console.log('MockAdapter booted');
+
+  store.watch(
+    () => store.state.mock,
+    (v) => {
+      if (v == null || v == undefined || v === false || v == "false") {
+        console.debug("--> demoMode mock disabled", v);
+
+        mock.restore();
+      } else {
+        console.debug("--> demoMode mock enabled", v);
+        http.defaults.adapter = mockAdapter;
+      }
+    },
+    { immediate: true }
+  );
+});
+
+
+/////////////////////////////////////////////////
+
+
+function bindMockRoutes(mock){
   mock.onGet("/terminals").reply(() => {
     console.log("fetched all terminals");
     return [200, terminals];
@@ -202,23 +228,7 @@ export default boot(({ app, store }) => {
 
   mock.onGet("/visits").reply(200, visits);
   mock.onAny().passThrough();
-
-  store.watch(
-    () => store.state.mock,
-    (v) => {
-      if (v == null || v == undefined || v === false || v == "false") {
-        console.debug("--> demoMode mock disabled", v);
-
-        mock.restore();
-      } else {
-        console.debug("--> demoMode mock enabled", v);
-        http.defaults.adapter = mockAdapter;
-      }
-    },
-    { immediate: true }
-  );
-});
-
+}
 
 const cards = [
   {
