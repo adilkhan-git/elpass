@@ -206,6 +206,7 @@ export default createStore({
       }).then((data)=>{
         state.cards = data.cards;
         state.totalCards = data.totalCards;
+        return data;
       });
     },
 
@@ -276,6 +277,7 @@ export default createStore({
     getVisits: (state) => state.visits,
     getUsers: (state) => state.users,
     lists: (state) => state.lists,
+    isAdmin : (state) => state.user && state.user.role === 'admin',
     isAuthenticated(state) {
       return state.user && state.user.firstName !== "Guest";
     },

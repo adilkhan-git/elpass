@@ -203,10 +203,17 @@ function bindMockRoutes(mock){
   });
 
   mock.onPost("/login").reply((config) => {
+    console.log('config.data',config.data);
     const { email, password } = JSON.parse(config.data);
+
     const user = users.find(
-      (user) => user.email === email && user.password === password
+      (u) => {
+        console.log(u.email, email, password,  u.email === email);
+        return u.email === email && u.password === password
+      }
     );
+
+    console.log(email, password,user, users );
 
     if (user) {
       return [
