@@ -103,6 +103,7 @@ export default {
       return query;
     },
     applyFilters() {
+      this.currentPage = 1;
       this.$router
         .push({ path: "/cards", query: this.buildFilterQuery() })
         .catch((err) => console.error("Router error:", err));

@@ -84,17 +84,17 @@ module.exports = configure(function (/* ctx */) {
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer
     devServer: {
       // https: true
-      open: false, // opens browser window automatically
-      port: 8080,
+      open: true, // opens browser window automatically
+      // port: 8080,
       allowedHosts: 'all',
       // public: 'https://app.rekassa.dev', 
       // publicPath: '/',
       headers: {
         'X-Server-Name': 'DEV'
       },
-      hmr : { 
-        clientPort: 443,
-      },
+      // hmr : { 
+      //   clientPort: 443,
+      // },
       // client: {
       //   webSocketURL: 'auto://app.elpass.uz/ws'
       // },

@@ -1,0 +1,42 @@
+[33mcommit b6f6082da382dad93beaec50c4da0692db4e858f[m
+Merge: eb92ac3 fe3b3ae
+Author: tjunussov <you@example.com>
+Date:   Thu Aug 31 13:07:50 2023 +0600
+
+    Merge branch 'main' into tjey
+
+[33mcommit eb92ac3754f71e53299db7f1897ba9a4f9971093[m
+Author: tjunussov <you@example.com>
+Date:   Thu Aug 31 13:03:15 2023 +0600
+
+    fixes vite
+
+[33mcommit 4debe24b26ca64154e404d8181390d83c959077d[m
+Author: Adilkhan <zmnbk888@gmail.com>
+Date:   Wed Aug 30 17:55:36 2023 +0600
+
+    refactored mock api
+
+[33mcommit 5bc378df63dd7abc9b2049eb4f00f82be6f3d209[m
+Author: Adilkhan <zmnbk888@gmail.com>
+Date:   Fri Aug 25 11:10:38 2023 +0600
+
+    added pagination on CardPage
+
+[33mcommit 0f328b902aef5ddb933a983c4f98ade272c42156[m
+Author: Adilkhan <zmnbk888@gmail.com>
+Date:   Wed Aug 16 13:23:51 2023 +0600
+
+    added i18n & updated terminals page
+
+[33mcommit 2de78772cf75104ad0902bd3300dde3180af4892[m
+Author: Adilkhan <zmnbk888@gmail.com>
+Date:   Fri Aug 11 18:11:30 2023 +0600
+
+    added UserList
+
+[33mcommit 12bfe3c10865bb35ed41a0aa3cc266230bd184df[m
+Author: Adilkhan <zmnbk888@gmail.com>
+Date:   Wed Jul 12 12:56:15 2023 +0600
+
+    initial commit
