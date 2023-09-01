@@ -235,10 +235,10 @@ export default {
   gap: 100px;
 }
 
-.q-input {
+/* .q-input {
   padding: 0;
   margin: 0;
-}
+} */
 
 .visitor-id,
 .visitor-type,
