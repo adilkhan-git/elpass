@@ -11,7 +11,7 @@
           @click="toggleLeftDrawer"
         />
 
-        <q-toolbar-title> elpass-frontend-vue-app </q-toolbar-title>
+        <q-toolbar-title> ELPASS </q-toolbar-title>
         <q-btn flat @click="setLocale('en')">EN</q-btn>
         <q-btn flat @click="setLocale('ru')">RU</q-btn>
 
@@ -255,10 +255,10 @@ export default defineComponent({
   margin-right: 5px;
 }
 
-.q-drawer {
+/* .q-drawer {
   background-color: rgb(230, 230, 230);
   display: flex;
   flex-direction: column;
   align-items: center;
-}
+} */
 </style>

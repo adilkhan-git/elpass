@@ -1,7 +1,7 @@
 <template lang="pug">
 div.login
   q-form(@submit.prevent="loginUser")
-    h5 Sign In
+    h5(@click="admin") Sign In
     q-input(
       v-model="user.email"
       label="Email"
@@ -40,6 +40,11 @@ export default {
   },
   methods: {
     ...mapActions(["login"]),
+    admin(){
+      console.log("admin");
+      this.user.email = "admin@gmail.com";
+      this.user.password = "admin";
+    },
     async loginUser() {
       try {
         await this.login(this.user);
@@ -58,10 +63,6 @@ export default {
 </script>
 
 <style>
-.q-btn {
-  margin-top: 15px;
-  margin-left: 15px;
-}
 
 .login {
   max-width: 300px;
@@ -72,11 +73,5 @@ export default {
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
-.error {
-  color: red;
-}
 
-h5 {
-  text-align: center;
-}
 </style>

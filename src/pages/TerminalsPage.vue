@@ -151,7 +151,5 @@ export default {
 </script>
 
 <style scoped>
-.q-page {
-  padding: 25px;
-}
+
 </style>
