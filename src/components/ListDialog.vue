@@ -3,17 +3,11 @@
     <q-card>
       <q-card-section>
         <q-form @submit="handleSubmit">
-          <q-input
-            v-model="list.name"
-            label="List Name"
-            
-            required
-          />
+          <q-input v-model="list.name" label="List Name" required />
           <q-input
             v-model="list.date"
             label="Creation Date"
             mask="YYYY-MM-DD"
-           
             required
           />
           <div>
@@ -42,7 +36,6 @@ export default {
     return {
       dialog: true,
       list: {},
-      // requiredRule: (val) => (val && val.length > 0) || "Field is required",
     };
   },
   watch: {
@@ -66,6 +59,4 @@ export default {
 };
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

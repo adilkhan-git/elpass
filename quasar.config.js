@@ -64,7 +64,7 @@ module.exports = configure(function (/* ctx */) {
       // analyze: true,
       // env: {},
       env: {
-        VERSION: require('./package.json').version,
+        VERSION: require("./package.json").version,
         CORDOVA: false,
       },
       // rawDefine: {}
@@ -86,13 +86,13 @@ module.exports = configure(function (/* ctx */) {
       // https: true
       open: true, // opens browser window automatically
       // port: 8080,
-      allowedHosts: 'all',
-      // public: 'https://app.rekassa.dev', 
+      allowedHosts: "all",
+      // public: 'https://app.rekassa.dev',
       // publicPath: '/',
       headers: {
-        'X-Server-Name': 'DEV'
+        "X-Server-Name": "DEV",
       },
-      // hmr : { 
+      // hmr : {
       //   clientPort: 443,
       // },
       // client: {

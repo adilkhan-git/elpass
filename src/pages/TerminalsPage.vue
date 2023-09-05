@@ -1,34 +1,48 @@
-<template>
-  <q-page>
-    <h4>{{ $t("terminalsTitle") }}</h4>
-    <q-btn
-      color="primary"
-      :label="$t('addTerminalButton')"
-      @click="openDialogForAddTerminal"
-    />
+<template lang="pug">
+q-page.q-pa-lg
+  h4 {{ $t("terminalsTitle") }}
+  q-btn(
+    color="primary",
+    :label="$t('addTerminalButton')",
+    @click="openDialogForAddTerminal"
+  )
 
-    <q-table
-      :rows="terminals"
-      row-key="id"
-      :columns="translatedColumns"
-      virtual-scroll
-      v-model:pagination="pagination"
-    >
-      <template v-slot:body-cell-actions="props">
-        <q-td :props="props">
-          <q-btn icon="edit" flat round @click="editTerminal(props.row.id)" />
-          <q-btn icon="delete" flat round @click="handleDelete(props.row.id)" />
-        </q-td>
-      </template>
-    </q-table>
+  q-table(
+    :rows="terminals",
+    row-key="id",
+    virtual-scroll,
+    flat,
+    bordered,
+    v-model:pagination="pagination",
+    :columns="tableColumns"
+  )
+    template(v-slot:body-cell-status="props")
+      q-td(:props="props")
+        span(:class="statusClass(props.row.online)") {{ statusText(props.row.online) }}
 
-    <terminal-dialog
-      v-model="isDialogVisible"
-      @added="fetchTerminals"
-      @closeDialog="closeDialog"
-      ref="terminalDialog"
-    ></terminal-dialog>
-  </q-page>
+    template(v-slot:body-cell-actions="props")
+      q-td(:props="props")
+        q-btn(
+          icon="edit",
+          flat,
+          round,
+          dense,
+          @click="editTerminal(props.row.id)"
+        )
+        q-btn(
+          icon="delete",
+          flat,
+          round,
+          dense,
+          @click="handleDelete(props.row.id)"
+        )
+
+  terminal-dialog(
+    v-model="isDialogVisible",
+    @added="fetchTerminals",
+    @closeDialog="closeDialog",
+    ref="terminalDialog"
+  )
 </template>
 
 <script>
@@ -45,51 +59,32 @@ export default {
       pagination: {
         rowsPerPage: 10,
       },
-      columns: [
+      tableColumns: [
         {
-          name: "terminal",
-          required: true,
-          label: "terminal",
+          name: "name",
+          label: "Name",
           align: "left",
           field: (row) => row.name,
         },
-        {
-          name: "url",
-          required: true,
-          label: "url",
-          align: "left",
-          field: (row) => row.url,
-        },
+        { name: "url", label: "URL", align: "left", field: (row) => row.url },
         {
           name: "type",
-          required: true,
-          label: "type",
+          label: "Type",
           align: "left",
-          field: (row) => row.type,
+          field: (row) => row.meta_.direction,
         },
         {
           name: "status",
-          required: true,
-          label: "status",
+          label: "Status",
           align: "left",
-          field: (row) => row.status,
+          field: (row) => (row.online ? "Онлайн" : "Оффлайн"),
         },
-        {
-          name: "actions",
-          label: "actions",
-          align: "left",
-        },
+        { name: "actions", label: "Actions", align: "left" },
       ],
     };
   },
   computed: {
     ...mapState(["terminals"]),
-    translatedColumns() {
-      return this.columns.map((column) => ({
-        ...column,
-        label: this.$t(column.label),
-      }));
-    },
   },
   mounted() {
     this.fetchTerminals();
@@ -100,23 +95,16 @@ export default {
       this.isDialogVisible = false;
     },
     openDialogForAddTerminal() {
-      console.log("openDialogForAddTerminal called");
-      this.isDialogVisible = true; // Добавьте эту строку
+      this.isDialogVisible = true;
       this.$refs.terminalDialog.openForAdd();
     },
-
-    // showAddTerminalDialog() {
-    //   this.isDialogVisible = true;
-    // },
     editTerminal(id) {
       const terminal = this.terminals.find((terminal) => terminal.id === id);
       if (terminal) {
         this.isDialogVisible = true;
-
         this.$refs.terminalDialog.openForEdit(terminal);
       }
     },
-
     handleDelete(id) {
       this.$q
         .dialog({
@@ -146,10 +134,14 @@ export default {
             });
         });
     },
+    statusClass(online) {
+      return online ? "text-green-6" : "text-red";
+    },
+    statusText(online) {
+      return online ? "Онлайн" : "Оффлайн";
+    },
   },
 };
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

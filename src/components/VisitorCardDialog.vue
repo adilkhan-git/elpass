@@ -1,5 +1,5 @@
 <template>
-  <q-dialog v-model="dialogVisible" @hide="handleHide" @keyup.enter="save">
+  <q-dialog v-model="showDialog" @hide="handleHide" @keyup.enter="save">
     <q-card class="dialog">
       <q-card-section>
         <div class="text-h6">
@@ -9,43 +9,37 @@
       <q-card-section>
         <q-input
           filled
-          v-model="localVisitor.firstName"
-          :label="$t('firstName')"
+          v-model="localCard.firstName"
+          :label="$t('name')"
           required
         ></q-input>
         <q-input
           filled
-          v-model="localVisitor.lastName"
-          :label="$t('lastName')"
-          required
-        ></q-input>
-        <q-input
-          filled
-          v-model="localVisitor.iin"
+          v-model="localCard.iin"
           :label="$t('iin')"
           required
         ></q-input>
         <q-input
           filled
-          v-model="localVisitor.phoneNumber"
+          v-model="localCard.phoneNumber"
           :label="$t('phoneNumber')"
           required
         ></q-input>
         <q-input
           filled
-          v-model="localVisitor.company"
+          v-model="localCard.company"
           :label="$t('company')"
           required
         ></q-input>
         <q-input
           filled
-          v-model="localVisitor.position"
+          v-model="localCard.position"
           :label="$t('positionTitle')"
           required
         ></q-input>
         <q-select
           filled
-          v-model="localVisitor.type"
+          v-model="localCard.type"
           :label="$t('type')"
           :options="[$t('multiEntry'), $t('temporary')]"
           required
@@ -97,6 +91,7 @@
 <script>
 import { Cropper } from "vue-advanced-cropper";
 import "vue-advanced-cropper/dist/style.css";
+import { mapActions } from "vuex";
 
 export default {
   components: {
@@ -108,8 +103,17 @@ export default {
   },
   data() {
     return {
-      dialogVisible: this.show,
-      localVisitor: null,
+      showDialog: false,
+      localCard: {
+        uuid: "",
+        no: "",
+        name: "",
+        group: "",
+        upload: null,
+        created_at: null,
+        begin_at: null,
+        end_at: null,
+      },
       isEditMode: false,
       imageUrl: null,
       cameraStream: null,
@@ -117,18 +121,16 @@ export default {
     };
   },
   watch: {
-    show(val) {
-      this.dialogVisible = val;
-    },
     visitor: {
       handler(val) {
-        this.localVisitor = { ...val };
+        this.localCard = { ...val };
         this.isEditMode = !!val;
       },
       immediate: true,
     },
   },
   methods: {
+    ...mapActions(["createCard"]),
     handleCropChange(coordinates) {
       const canvas = this.$refs.cropper.getCanvas(coordinates);
       this.displayedImageUrl = canvas.toDataURL("image/jpeg");
@@ -197,21 +199,38 @@ export default {
     },
     save() {
       this.$emit("update:show", false);
-      this.$emit("save", {
-        ...this.localVisitor,
-        photoUrl: this.imageUrl,
-      });
-      this.resetForm();
+      this.$store
+        .dispatch("createCard", this.localCard)
+        .then(() => {
+          this.$q.notify({
+            color: "green-4",
+            textColor: "white",
+            icon: "info",
+            message: "Card created successfully",
+          });
+          this.resetForm();
+        })
+        .catch((error) => {
+          console.error("Error creating card:", error);
+          this.$q.notify({
+            color: "red-4",
+            textColor: "white",
+            icon: "warning",
+            message: "Failed to create card",
+          });
+        });
     },
+
     resetForm() {
-      this.localVisitor = {
-        firstName: "",
-        lastName: "",
-        iin: "",
-        phoneNumber: "",
-        company: "",
-        position: "",
-        type: "",
+      this.localCard = {
+        uuid: "",
+        no: "",
+        name: "",
+        group: "",
+        upload: null,
+        created_at: null,
+        begin_at: null,
+        end_at: null,
       };
       this.imageUrl = null;
     },
@@ -219,13 +238,13 @@ export default {
   computed: {
     canSave() {
       return (
-        this.localVisitor.firstName &&
-        this.localVisitor.lastName &&
-        this.localVisitor.iin &&
-        this.localVisitor.phoneNumber &&
-        this.localVisitor.company &&
-        this.localVisitor.position &&
-        this.localVisitor.type
+        this.localCard.name &&
+        this.localCard.uuid &&
+        this.localCard.no &&
+        this.localCard.phoneNumber &&
+        this.localCard.company &&
+        this.localCard.position &&
+        this.localCard.type
       );
     },
   },

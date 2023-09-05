@@ -22,17 +22,19 @@ export default createStore({
   actions: {
     updateUser({ state }, updatedUser) {
       const userIndex = state.users.findIndex(
-        (user) => user.id === updatedUser.id
+        (user) => user.id === updatedUser.id,
       );
       if (userIndex !== -1) {
         state.users[userIndex] = updatedUser;
       }
     },
     login({ state }, user) {
-        return api.login({
+      return api
+        .login({
           email: user.email,
           password: user.password,
-        }).then((resp)=>{
+        })
+        .then((resp) => {
           state.user = resp.data.user;
           state.token = resp.data.token;
         });
@@ -43,8 +45,8 @@ export default createStore({
     },
     async fetchLists({ state }) {
       try {
-        const response = await http.get("/lists");
-        state.lists = response.data;
+        const response = await api.fetchLists();
+        state.lists = response;
       } catch (error) {
         console.error(error);
       }
@@ -91,8 +93,8 @@ export default createStore({
 
     async fetchTerminals({ state }) {
       try {
-        const response = await axios.get("/terminals");
-        state.terminals = response.data;
+        const data = await api.fetchTerminals();
+        state.terminals = data;
       } catch (error) {
         console.error(error);
       }
@@ -111,7 +113,7 @@ export default createStore({
       try {
         await axios.delete(`/terminals/${id}`);
         const index = state.terminals.findIndex(
-          (terminal) => terminal.id === id
+          (terminal) => terminal.id === id,
         );
         if (index !== -1) {
           state.terminals.splice(index, 1);
@@ -124,10 +126,10 @@ export default createStore({
       try {
         const response = await axios.put(
           `/terminals/${updatedTerminal.id}`,
-          updatedTerminal
+          updatedTerminal,
         );
         const index = state.terminals.findIndex(
-          (terminal) => terminal.id === updatedTerminal.id
+          (terminal) => terminal.id === updatedTerminal.id,
         );
         if (index !== -1) {
           state.terminals[index] = response.data;
@@ -199,28 +201,55 @@ export default createStore({
     // },
 
     fetchCards({ state }, { page = 1, limit = 10, filters = {} } = {}) {
-      return api.fetchCards({
-        page,
-        limit,
-        filters,
-      }).then((data)=>{
-        state.cards = data.cards;
-        state.totalCards = data.totalCards;
-        return data;
-      });
+      return api
+        .fetchCards({
+          page,
+          limit,
+          filters,
+        })
+        .then((data) => {
+          state.cards = data.cards;
+          state.totalCards = data.totalCards;
+          return data;
+        });
+    },
+    createCard({ state }, cardData) {
+      return api
+        .createCard(cardData)
+        .then((newCard) => {
+          state.cards.push(newCard);
+          return newCard;
+        })
+        .catch((error) => {
+          console.error("Error creating card:", error);
+          throw error;
+        });
     },
 
     async deleteCard({ state }, uuid) {
       try {
-        await axios.delete(`https://api.elpass.uz/el_tcards?uuid=eq.${uuid}`);
+        await api.deleteCard(uuid);
         state.cards = state.cards.filter((card) => card.uuid !== uuid);
       } catch (error) {
-        console.error("Axios error:", error);
-        if (error.response) {
-          console.error("Error response data:", error.response.data);
-        }
+        console.error(error);
       }
     },
+    // async upsertCard({ state }, card) {
+    //   try {
+    //     if (card.uuid) {
+    //       const updatedCard = await api.updateCard(card.uuid, card);
+    //       const index = state.cards.findIndex((c) => c.uuid === card.uuid);
+    //       if (index !== -1) {
+    //         state.cards.splice(index, 1, updatedCard);
+    //       }
+    //     } else {
+    //       const newCard = await api.createCard(card);
+    //       state.cards.push(newCard);
+    //     }
+    //   } catch (error) {
+    //     console.error("Error in upsert operation:", error);
+    //   }
+    // },
 
     // async uploadPhoto({ state }, photo) {
     //   try {
@@ -236,21 +265,21 @@ export default createStore({
     //   }
     // },
 
-    async addCard({ dispatch, state }, card) {
-      try {
-        if (card.photo) {
-          const photoUrl = await dispatch("uploadPhoto", card.photo);
-          card.photoUrl = photoUrl;
-        }
-        const response = await axios.post("/cards", card);
-        const newCard = response.data;
-        state.cards.push(newCard);
-        return newCard;
-      } catch (error) {
-        console.error(error);
-        throw error;
-      }
-    },
+    // async addCard({ dispatch, state }, card) {
+    //   try {
+    //     if (card.photo) {
+    //       const photoUrl = await dispatch("uploadPhoto", card.photo);
+    //       card.photoUrl = photoUrl;
+    //     }
+    //     const response = await axios.post("/cards", card);
+    //     const newCard = response.data;
+    //     state.cards.push(newCard);
+    //     return newCard;
+    //   } catch (error) {
+    //     console.error(error);
+    //     throw error;
+    //   }
+    // },
 
     async updateCard({ dispatch, state }, updatedCard) {
       try {
@@ -260,7 +289,7 @@ export default createStore({
         }
         await axios.put(`/cards/${updatedCard.id}`, updatedCard);
         const index = state.cards.findIndex(
-          (card) => card.id === updatedCard.id
+          (card) => card.id === updatedCard.id,
         );
         if (index !== -1) {
           state.cards.splice(index, 1, updatedCard);
@@ -277,7 +306,7 @@ export default createStore({
     getVisits: (state) => state.visits,
     getUsers: (state) => state.users,
     lists: (state) => state.lists,
-    isAdmin : (state) => state.user && state.user.role === 'admin',
+    isAdmin: (state) => state.user && state.user.role === "admin",
     isAuthenticated(state) {
       return state.user && state.user.firstName !== "Guest";
     },

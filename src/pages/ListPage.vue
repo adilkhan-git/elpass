@@ -1,162 +1,120 @@
-<template>
-  <q-page>
-    <h4>{{ $t("listsPage.lists") }}</h4>
-    <q-btn v-if="isAdmin" label="Add List" @click="addList" />
-    <q-table
-      :rows="lists"
-      row-key="id"
-      :columns="translatedColumns"
-      virtual-scroll
-      v-model:pagination="pagination"
-    >
-      <template v-slot:body-cell-actions="props">
-        <q-td :props="props">
-          <q-btn
-            v-if="isAdmin"
-            icon="edit"
-            flat
-            round
-            @click="editList(props.row.id)"
-          />
-          <q-btn
-            v-if="isAdmin"
-            icon="delete"
-            flat
-            round
-            @click="confirmDelete(props.row.id)"
-          />
-        </q-td>
-      </template>
+<template lang="pug">
+q-page.q-pa-lg
+  h4 {{ $t("listsPage.lists") }}
+  q-btn(v-if="isAdmin", label="Add List", @click="showEditDialog")
+  q-table(
+    :rows="lists",
+    row-key="code",
+    :columns="columns",
+    virtual-scroll,
+    v-model:pagination="pagination"
+  )
+    template(v-slot:body-cell-name="props")
+      q-td(:props="props")
+        div {{ props.row.name }}
+        small {{ props.row.note }}
 
-      <template v-slot:body-cell-upload="props">
-        <q-td :props="props">
-          <q-btn
-            icon="cloud_upload"
-            color="orange"
-            flat
-            round
-            @click="openUploadDialog"
-          />
-          <q-btn
-            icon="block"
-            color="black"
-            flat
-            round
-            @click="openBlockDialog"
-          />
-        </q-td>
-      </template>
-    </q-table>
-    <list-dialog
-      :initial-list="selectedList"
-      :is-edit="isEdit"
-      v-if="dialogShown"
-      @confirm="handleConfirm"
-      @cancel="handleCancel"
-    />
-    <q-dialog v-model="uploadDialog">
-      <q-card>
-        <q-card-section>
-          <q-tabs v-model="tab" align="justify">
-            <q-tab name="csv" label="CSV" />
-            <q-tab name="zip" label="ZIP" />
-          </q-tabs>
+    template(v-slot:body-cell-date="props")
+      q-td(:props="props")
+        div {{ formatDate(props.row.created_at) }}
+        small {{ formatDate(props.row.updated_at) }} Изменили
 
-          <q-tab-panels v-model="tab">
-            <q-tab-panel name="csv">
-              <q-file
-                v-model="csvFiles"
-                label="Choose CSV files"
-                accept=".csv"
-                multiple
-              />
-              <q-btn label="Upload CSV" @click="uploadCSV" />
-            </q-tab-panel>
-            <q-tab-panel name="zip">
-              <q-file
-                v-model="zipFiles"
-                label="Choose ZIP files"
-                accept=".zip"
-                multiple
-              />
-              <q-btn label="Upload ZIP" @click="uploadZIP" />
-            </q-tab-panel>
-          </q-tab-panels>
-        </q-card-section>
+    template(v-slot:body-cell-start="props")
+      q-td(:props="props") {{ formatDate(props.row.valid_from_at, true) }}
 
-        <q-card-actions align="right">
-          <q-btn flat label="Закрыть" @click="uploadDialog = false" />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
-  </q-page>
+    template(v-slot:body-cell-end="props")
+      q-td(:props="props") {{ formatDate(props.row.valid_to_at, true) }}
+
+    template(v-slot:body-cell-upload="props")
+      q-td(:props="props")
+        div(v-if="props.row.stats_")
+          span.text-yellow-9 {{ props.row.stats_.cntOk || 0 }}/{{ props.row.stats_.csv || 0 }}
+            q-icon.q-ml-xs(name="folder", @click="showUploadDialog")
+          span.text-black {{ props.row.stats_.cntOkBlack || 0 }}/
+            q-icon.q-ml-xs(name="folder", @click="showUploadDialog")
+
+    template(v-slot:body-cell-sync="props")
+      q-td(:props="props")
+        q-icon.text-yellow-9(name="sync")
+
+    template(v-slot:body-cell-actions="props")
+      q-td(:props="props")
+        q-btn(
+          v-if="isAdmin",
+          icon="edit",
+          flat,
+          round,
+          @click="showEditDialog(props.row)"
+        )
+        q-btn(
+          v-if="isAdmin",
+          icon="delete",
+          flat,
+          round,
+          @click="confirmDelete(props.row.code)"
+        )
+  list-dialog(
+    v-model="uploadDialog",
+    :initialList="selectedList",
+    @cancel="handleDialogCancel"
+  )
+  batch-upload-dialog(
+    :modelValue="batchUploadDialogVisible",
+    @update:modelValue="batchUploadDialogVisible = $event"
+  )
 </template>
 
 <script>
 import { mapState, mapActions } from "vuex";
 import ListDialog from "src/components/ListDialog.vue";
+import BatchUploadDialog from "src/components/BatchUploadDialog.vue";
+import { date } from "quasar";
 
 export default {
   components: {
     ListDialog,
+    BatchUploadDialog,
   },
   data() {
     return {
       uploadDialog: false,
-      tab: "csv",
-      csvFiles: [],
-      zipFiles: [],
-      dialogShown: false,
-      isEdit: false,
-      selectedList: null,
+      selectedList: {
+        id: null,
+        name: "",
+        date: "",
+      },
+      batchUploadDialogVisible: false,
       pagination: {
         rowsPerPage: 10,
       },
       columns: [
         {
           name: "name",
-          required: true,
-          label: "listName",
+          label: "Наименование",
           align: "left",
           field: (row) => row.name,
         },
-        {
-          name: "date",
-          required: true,
-          label: "creationDate",
-          align: "left",
-          field: (row) => row.date,
-        },
-        {
-          name: "upload",
-          required: true,
-          label: "upload",
-          align: "left",
-        },
-        {
-          name: "actions",
-          label: "actions",
-          align: "left",
-        },
+        { name: "date", label: "Дата создания", align: "left" },
+        { name: "start", label: "Дата с", align: "left" },
+        { name: "end", label: "Дата по", align: "left" },
+        { name: "upload", label: "Загрузка", align: "left" },
+        { name: "sync", label: "Синхронизация", align: "center" },
+        { name: "actions", label: "Действия", align: "center" },
       ],
     };
   },
   computed: {
     ...mapState(["lists", "user"]),
     isAdmin() {
-      return this.user && this.user.role === "admin";
+      return this.user?.role === "admin";
     },
-    isOperator() {
-      return this.user && this.user.role === "operator";
-    },
-    isEmployee() {
-      return this.user && this.user.role === "employee";
-    },
-    translatedColumns() {
-      return this.columns.map((column) => ({
-        ...column,
-        label: this.$t(`listsPage.${column.label}`),
-      }));
+    formatDate() {
+      return (dateTime, withTime = false) => {
+        if (withTime) {
+          return date.formatDate(dateTime, "DD MMM YY HH:mm");
+        }
+        return date.formatDate(dateTime, "DD MMM YY");
+      };
     },
   },
   mounted() {
@@ -164,34 +122,20 @@ export default {
   },
   methods: {
     ...mapActions(["fetchLists", "deleteList", "editList"]),
-    openUploadDialog() {
+    showEditDialog(list = { id: null, name: "", date: "" }) {
+      this.selectedList = { ...list };
       this.uploadDialog = true;
     },
-    openBlockDialog() {
-      this.uploadDialog = true;
+
+    showUploadDialog() {
+      this.batchUploadDialogVisible = true;
     },
-    async uploadCSV() {
-      // Обработка и загрузка CSV файлов
-    },
-    async uploadZIP() {
-      // Обработка и загрузка ZIP файлов
-    },
-    addList() {
-      this.selectedList = { id: null, name: "", date: "" };
-      this.isEdit = false;
-      this.dialogShown = true;
-    },
-    editList(id) {
-      const list = this.lists.find((item) => item.id === id);
-      this.selectedList = Object.assign({}, list);
-      this.isEdit = true;
-      this.dialogShown = true;
+    handleDialogCancel() {
+      this.uploadDialog = false;
     },
     async handleConfirm(list) {
-      console.log("Data received from dialog:", list);
-      this.dialogShown = false;
       try {
-        if (this.isEdit) {
+        if (list.id) {
           await this.editList(list);
         } else {
           await this.addList(list);
@@ -200,39 +144,20 @@ export default {
       } catch (error) {
         console.error("Error handling list:", error);
       }
-    },
-    handleCancel() {
-      this.dialogShown = false;
-    },
-
-    async editListInStore(list) {
-      try {
-        await this.editList(list);
-        await this.fetchLists();
-      } catch (error) {}
-    },
-    async addListToStore(list) {
-      try {
-        await this.fetchLists();
-      } catch (error) {}
+      this.uploadDialog = false;
     },
     confirmDelete(id) {
       this.$q
         .dialog({
           title: this.$t("listsPage.confirmTitle"),
           message: this.$t("listsPage.confirmMessage"),
-          ok: {
-            label: this.$t("listsPage.confirmDelete"),
-            color: "negative",
-          },
+          ok: { label: this.$t("listsPage.confirmDelete"), color: "negative" },
           cancel: {
             label: this.$t("listsPage.confirmCancel"),
             color: "primary",
           },
         })
-        .onOk(() => {
-          this.handleDelete(id);
-        });
+        .onOk(() => this.handleDelete(id));
     },
     async handleDelete(id) {
       try {
@@ -257,6 +182,4 @@ export default {
 };
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
